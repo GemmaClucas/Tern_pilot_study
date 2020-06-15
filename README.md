@@ -97,4 +97,4 @@ Shannon diversity is flat all the way along for ROST and COTE (ignoring ARTE as 
 
 The number of observed OTUs is 2 for COTE all the way along, but jumps up to 3 for ROST at somewhere between 200 and 400 sequences. **Use a rarefaction depth of 400 for all tern samples.** Note that this is almost the same conclusion that I came to when running this is December (then I thought 500 but I didn't have as fine a scale for the sampling depth).
 
-![alpha-rarefaction](Figures/Tern_alpha_rarefaction_100-3000.png)
+![alt text](Figures/Tern_alpha_rarefaction_100-3000.png)
