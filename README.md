@@ -4,9 +4,9 @@ This is an outline of the steps I'm taking to finish the analyses for this first
 
 ## Useful links
 
-[Qiime documentation](https://docs.qiime2.org/2020.2/)
-[Qiime forum](https://forum.qiime2.org/)
-[Qiime viewer](https://view.qiime2.org/)
+[Qiime documentation](https://docs.qiime2.org/2020.2/)  
+[Qiime forum](https://forum.qiime2.org/)  
+[Qiime viewer](https://view.qiime2.org/)  
 
 ## 1. Extract just the terns from the full dataset (which includes puffins and tropicbirds)
 
@@ -97,4 +97,4 @@ Shannon diversity is flat all the way along for ROST and COTE (ignoring ARTE as 
 
 The number of observed OTUs is 2 for COTE all the way along, but jumps up to 3 for ROST at somewhere between 200 and 400 sequences. **Use a rarefaction depth of 400 for all tern samples.** Note that this is almost the same conclusion that I came to when running this is December (then I thought 500 but I didn't have as fine a scale for the sampling depth).
 
-![alt text](Figures/Tern_alpha_rarefaction_100-3000.png)
+![alpha-rarefaction](Figures/Tern_alpha_rarefaction_100-3000.png)

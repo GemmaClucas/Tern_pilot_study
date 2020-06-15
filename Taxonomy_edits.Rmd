@@ -7,12 +7,18 @@ output:github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library("qiime2R")
+library(tidyverse)
+library(qiime2R)
+library(stringr)
 ```
 
-## Read in qiime taxonomy artifact
+### Read in qiime taxonomy artifact
 
 ```{r}
 tax <- read_qza("/Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fecal_data_analysis/MiFish/final_taxonomy_superblast/superblast_taxonomy.qza")
 ```
+
+### Separate the taxonomy strings into separate columns to work with
+
+
 
