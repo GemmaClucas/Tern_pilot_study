@@ -1,0 +1,18 @@
+---
+title: "Taxonomy_edits"
+author: "Gemma Clucas"
+date: "6/15/2020"
+output:github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("qiime2R")
+```
+
+## Read in qiime taxonomy artifact
+
+```{r}
+tax <- read_qza("/Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fecal_data_analysis/MiFish/final_taxonomy_superblast/superblast_taxonomy.qza")
+```
+
