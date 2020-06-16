@@ -123,3 +123,40 @@ Then I exported the ```.csv``` file from Qiime Viewer using level 20 taxonomy.
 Note, next time I come to run something like this, I should use the scientific names but without the full taxonomy string. I think it would make processing the data afterwards a lot easier.
 
 ## 4. Check all species assignments (range, confidence, similarity to other species)
+
+Create a list here of the edits I need to make, then edit the ```superblast_taxonomy.qza``` artefact and reload into Qiime to do downstream analyses.
+
+### Sandlances - is it possible to differentiate species?
+
+Making a tree would help to solve this.
+```
+# Filter the Ammodytidae sequences and I'm including Sebastidae as an outgroup
+qiime taxa filter-seqs\
+     --i-sequences Terns/Terns_seqs.qza\
+     --i-taxonomy superblast_taxonomy.qza\
+     --p-include Ammodytidae,Sebastidae\
+     --o-filtered-sequences Terns/Ammodytidae_rep-seqs
+
+# Make the tree   
+qiime phylogeny align-to-tree-mafft-fasttree \
+    --i-sequences Terns/Ammodytidae_rep-seqs.qza \
+    --p-n-threads 0 \
+    --o-alignment Ammodytidae_alignment \
+    --o-masked-alignment Ammodytidae_masked-alignment \
+    --o-tree Ammodytidae_tree \
+    --o-rooted-tree Ammodytidae_rooted-tree \
+    --verbose
+```
+
+The tree can be viewed at https://itol.embl.de/tree/2459563435071592327228 
+There are three main clades for *Ammodytes americanus* (american sand lance), *A. dubius* (northern sand lance), and *A. personatus* (Pacific sand lance). However, blasting the Pacific sandlance sequences shows:
+1. *A. marinus* (Lesser sand eel) and *A. tobianus* (Small sand eel) have since been added to the database, and these are a slightly better match. However their distributions are in the northeast Atlantic around the UK.
+2. There are also high percent ID matches with *A. hexapterus* and a lot of other *Ammodytes* species and so I think it's really impossible to tell what exactly they are.
+Most of the ROST sandlance sequences match *A. personatus* but it's clearly not that, so I think there is maybe just too much ILS in this group to be able to make species assignments.
+
+
+1. Remove taxonomy string from all entries.
+2. Group all *Alosa* species to the genus level.
+3. Group *Clupea pallasi* into *Clupea harengus*. *Pallasi* only comes up once in a sample with lots of *harengus* and so this may be a PCR error.
+4. Remove *Sardinops melanostictus.* It is a monotypic genus and only two reads were pulled through in a single sample after rarefying. Could this be contamination from a tropicbird sample? No, it only comes up in one sample in the entire dataset. PCR error then?
+5. 
