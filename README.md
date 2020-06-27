@@ -155,7 +155,7 @@ There are three main clades for *Ammodytes americanus* (american sand lance), *A
 Most of the ROST sandlance sequences match *A. personatus* but it's clearly not that, so I think there is maybe just too much incomplete lineage sorting in this group to be able to make species assignments.  
 **Just classify all *Ammodytes* sequences as sand lances or *Ammodytes sp*.**
 
-### Other changes to make:
+### Full list of changes to make:
 
 1. Remove taxonomy string from all entries.
 2. Group all *Alosa* species to the genus level. The [tree](https://itol.embl.de/tree/2459563128991591800862#) shows that *A. aestivalis* (Blueback herring), *A. pseudoharengus* (Alewife) and *A. alosa* (Allis shad) do not form monophyletic clades for 12S, so it seems impossible to make species assignments for these.
@@ -163,6 +163,7 @@ Most of the ROST sandlance sequences match *A. personatus* but it's clearly not 
 4. Change *Sardinops melanostictus* (South American pilchard) to *Clupea harengus*. It is a monotypic genus and only two reads were pulled through in a single sample after rarefying. Could this be contamination from a tropicbird sample? No, it only comes up in one COTE chick sample in the entire dataset. I guess it must be a PCR error then? That sample contains *C. harengus*, so just adding two sequences to the count for that species should have a very minimal impact on anything.
 5. Change *Etheostoma parvipinne* to *Etheostomatinae* which is a subfamily within the Percidae (darters and logperches) as it's only a 95% match to the closest species on genback, but there are lots of matches to species within *Etheostomatinae.*
 6. Change *Scomber japonicus* to *Scomber colias* (Atlantic chub mackerel), which is a 99 or 100% match. The range is fine, they tend to be found in warmer waters than the GoM but the range map does show that they can occur in the GoM. *Scomber scombrus* (Atlantic mackerel) has a higher occurence in the GoM but is only a 95% match. It was also a 100% match to *Scomber australasicus* but that is found in the Pacific.
+7. Group all *Ammodytes* sequences to *Ammodytes sp*.
 
 
 ### Species that pass:
