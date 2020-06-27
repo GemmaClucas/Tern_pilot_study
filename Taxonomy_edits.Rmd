@@ -27,6 +27,7 @@ The edits I am making are, in this order:
 4. Change *Sardinops melanostictus* (South American pilchard) to *Clupea harengus* (Atlantic herring).  
 5. Change *Etheostoma parvipinne* to *Etheostomatinae*.  
 6. Change *Scomber japonicus* to *Scomber colias* (Atlantic chub mackerel).  
+7. Group all *Ammodytes* sequences to *Ammodytes sp*.  
 
 Note that a useful function for checking whether changes have worked is ```str_detect()``` e.g. ```tax$data$Taxon %>% str_detect("Sardinops melanostictus")``` shows where it is in the dataframe.
 
@@ -37,8 +38,9 @@ tax$data$Taxon <- tax$data$Taxon %>%
   str_replace("Clupea pallasi", "Clupea harengus") %>% 
   str_replace("Sardinops melanostictus", "Clupea harengus") %>% 
   str_replace("Etheostoma parvipinne", "Etheostomatinae") %>% 
-  str_replace("Scomber japonicus", "Scomber colias")
+  str_replace("Scomber japonicus", "Scomber colias") %>% 
+  str_replace_all("Ammodytes .*", "Ammodytes sp.")
 
 ```
 
-
+### Export back to Qiime artefact
