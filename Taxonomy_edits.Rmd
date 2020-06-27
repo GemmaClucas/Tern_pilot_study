@@ -26,34 +26,19 @@ The edits I am making are, in this order:
 3. Group *Clupea pallasi* (Pacific herring) into *Clupea harengus* (Atlantic herring).  
 4. Change *Sardinops melanostictus* (South American pilchard) to *Clupea harengus* (Atlantic herring).  
 5. Change *Etheostoma parvipinne* to *Etheostomatinae*.  
-6. Change *Scomber japonicus* to *Scomber colias* (Atlantic chub mackerel)
+6. Change *Scomber japonicus* to *Scomber colias* (Atlantic chub mackerel).  
 
-Note that a useful function for checking whether changes have worked is ```str_detect()``` e.g. ```str_detect("Sardinops melanostictus")``` shows where it is in the dataframe
+Note that a useful function for checking whether changes have worked is ```str_detect()``` e.g. ```tax$data$Taxon %>% str_detect("Sardinops melanostictus")``` shows where it is in the dataframe.
 
 ```{r}
-
-
-
-tax$data$Taxon %>% 
+tax$data$Taxon <- tax$data$Taxon %>% 
   str_replace_all(".*;", "") %>% 
   str_replace_all("Alosa .*", "Alosa sp.") %>% 
   str_replace("Clupea pallasi", "Clupea harengus") %>% 
   str_replace("Sardinops melanostictus", "Clupea harengus") %>% 
   str_replace("Etheostoma parvipinne", "Etheostomatinae") %>% 
-  str_replace("Scomber japonicus", "Scomber colias") %>% 
-  str_detect("Etheostoma parvipinne")
-
-
-tax$data$Taxon %>% str_detect("Etheostoma parvipinne")
-```
-
-### Taxonomy edits
-
-Group all sandlances into *Alosa sp.*
-```{r}
-tax$data$Taxon
+  str_replace("Scomber japonicus", "Scomber colias")
 
 ```
-
 
 
