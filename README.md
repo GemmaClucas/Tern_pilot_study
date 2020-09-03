@@ -92,7 +92,7 @@ Shannon diversity is flat all the way along for ROST and COTE (not shown; ignori
 
 The number of observed OTUs is 2 for COTE all the way along, but jumps up to 3 for ROST at somewhere between 200 and 400 sequences. **Use a rarefaction depth of 400 for all tern samples.** Note that this is almost the same conclusion that I came to when running this in December 2019 (then I suggested using 500, but I didn't have as fine a scale for the sampling depth).
 
-Note that in this screenshot from the Qiime Viewer, the COTE line runs along the x-axis, so you can't reall see it.
+Note that in this screenshot from the Qiime Viewer, the COTE line runs along the x-axis, so you can't really see it.
 
 ![alpha-rarefaction](Figures/Tern_alpha_rarefaction_100-3000.png)
 
@@ -245,4 +245,4 @@ Most of the ROST sandlance sequences match *A. personatus* but it's clearly not 
     + *Urophycis tenuis* has a complete sequence in the database, but is only a 94% match
 21. *Urophycis regia*, 99-100% match, range is good, but note that the sequence on genbank is only 133 bases long
     + *Urophycis floridan* has a complete sequence in the database, but is only a 95% match and doesn't occur in GoM
-22. *Urophycis tenuis* has 98-100% match, range is good, the nest closest species has 91% match
+22. *Urophycis tenuis* has 98-100% match, range is good, the next closest species has 91% match
