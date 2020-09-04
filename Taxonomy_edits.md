@@ -84,7 +84,7 @@ later filtered out.
 write.table(tax$data, 
           quote = FALSE, 
           row.names = FALSE,
-          file = "/Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fecal_data_analysis/MiFish/final_taxonomy_superblast/Terns/taxonomy_edited.tsv",
+          file = "/Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fecal_data_analysis/MiFish/final_taxonomy_superblast/Terns/superblast_taxonomy_edited.tsv",
           sep = "\t")
 ```
 
@@ -97,12 +97,12 @@ is:
 ``` bash
 cd /Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fecal_data_analysis/MiFish/final_taxonomy_superblast/
 
-sed -i.bak 's/Feature.ID/Feature ID/g' Terns/taxonomy_edited.tsv
+sed -i.bak 's/Feature.ID/Feature ID/g' Terns/superblast_taxonomy_edited.tsv
 
 conda activate qiime2-2019.4
 
 qiime tools import \
-  --input-path Terns/taxonomy_edited.tsv \
-  --output-path Terns/taxonomy_edited.qza \
+  --input-path Terns/superblast_taxonomy_edited.tsv \
+  --output-path Terns/superblast_taxonomy_edited.qza \
   --type 'FeatureData[Taxonomy]'
 ```
