@@ -1,41 +1,42 @@
----
-title: "Taxonomy_edits"
-author: "Gemma Clucas"
-date: "6/15/2020"
-output: github_document
----
+Taxonomy\_edits
+================
+Gemma Clucas
+6/15/2020
 
-Edited: 9/4/2020
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-library(qiime2R)
-library(stringr)
-```
+Edited:
+9/4/2020
 
 ### Read in qiime taxonomy artifact
 
-```{r}
+``` r
 tax <- read_qza("/Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fecal_data_analysis/MiFish/final_taxonomy_superblast/superblast_taxonomy.qza")
 ```
 
 ### Make edits to the taxonomy strings
 
 The edits I am making are, in this order:  
-1. Remove the entire taxonomy string except the species name (the base R way to do this would be ```(".*;", "", tax$data$Taxon)```).  
-2. Group all river herring into *Alosa sp.*  
-3. Group *Clupea pallasi* (Pacific herring) into *Clupea harengus* (Atlantic herring).  
-4. Change *Sardinops melanostictus* (South American pilchard) to *Clupea harengus* (Atlantic herring).  
-5. Change *Etheostoma parvipinne* to *Etheostomatinae*.  
-6. Change *Scomber japonicus* to *Scomber colias* (Atlantic chub mackerel).  
-7. Group all *Ammodytes* sequences to *Ammodytes sp*.  
+1\. Remove the entire taxonomy string except the species name (the base
+R way to do this would be `(".*;", "", tax$data$Taxon)`).  
+2\. Group all river herring into *Alosa sp.*  
+3\. Group *Clupea pallasi* (Pacific herring) into *Clupea harengus*
+(Atlantic herring).  
+4\. Change *Sardinops melanostictus* (South American pilchard) to
+*Clupea harengus* (Atlantic herring).  
+5\. Change *Etheostoma parvipinne* to *Etheostomatinae*.  
+6\. Change *Scomber japonicus* to *Scomber colias* (Atlantic chub
+mackerel).  
+7\. Group all *Ammodytes* sequences to *Ammodytes sp*.
 
-Note that a useful function for checking whether changes have worked is ```str_detect()``` e.g. ```tax$data$Taxon %>% str_detect("Sardinops melanostictus")``` shows where it is in the dataframe.
+Note that a useful function for checking whether changes have worked is
+`str_detect()` e.g. `tax$data$Taxon %>% str_detect("Sardinops
+melanostictus")` shows where it is in the dataframe.
 
-Also note that there is a built-in function called ```parse_taxonomy()``` but this expects a 7 category taxonomy string, and so I can't use it for my data. Next time, using 7 category strings would be a lot more helpful.
+Also note that there is a built-in function called `parse_taxonomy()`
+but this expects a 7 category taxonomy string, and so I can’t use it for
+my data. Next time, using 7 category strings would be a lot more
+helpful.
 
-```{r}
+``` r
 # Count the number of instances of things before I make changes
 # tax$data %>% filter(grepl("Etheostoma parvipinne", Taxon)) %>% count() # 1
 # tax$data %>% filter(grepl("Sardinops melanostictus", Taxon)) %>% count() # 1
@@ -69,14 +70,17 @@ tax$data$Taxon <- tax$data$Taxon %>%
 # tax$data %>% filter(grepl("Ammodytes sp.", Taxon)) %>% count() # 266, there are three Ammodytes hexapterus counted
 # tax$data %>% filter(grepl("Scomber japonicus", Taxon)) %>% count() # retuns 0 which is correct
 # tax$data %>% filter(grepl("Scomber colias", Taxon)) %>% count() # retuns 1 which is correct
-
 ```
 
-Note that the taxonomy artefact includes all assignments that were made when I assigned taxonomy i.e. before I did any filtering. This means that unassigned features are in there, features from puffins and tropicbirds are in there, and features from birds and mammals that were later filtered out.
+Note that the taxonomy artefact includes all assignments that were made
+when I assigned taxonomy i.e. before I did any filtering. This means
+that unassigned features are in there, features from puffins and
+tropicbirds are in there, and features from birds and mammals that were
+later filtered out.
 
 ### Export and reload in qiime
 
-```{r}
+``` r
 write.table(tax$data, 
           quote = FALSE, 
           row.names = FALSE,
@@ -84,11 +88,13 @@ write.table(tax$data,
           sep = "\t")
 ```
 
+**NOTE - R puts a period into the header `Feature ID` which makes the
+file invalid for Qiime ヽ༼ ಠ益ಠ ༽ﾉ**
 
-**NOTE - R puts a period into the header ```Feature ID```  which makes the file invalid for Qiime ヽ༼ ಠ益ಠ ༽ﾉ**
+The command for removing the period and reloading into qiime
+is:
 
-The command for removing the period and reloading into qiime is:
-```{bash, eval = FALSE}
+``` bash
 cd /Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fecal_data_analysis/MiFish/final_taxonomy_superblast/
 
 sed -i.bak 's/Feature.ID/Feature ID/g' Terns/taxonomy_edited.tsv
@@ -100,4 +106,3 @@ qiime tools import \
   --output-path Terns/taxonomy_edited.qza \
   --type 'FeatureData[Taxonomy]'
 ```
-
