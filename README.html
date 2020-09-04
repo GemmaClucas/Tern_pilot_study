@@ -460,7 +460,7 @@ I need to collapse the taxonomy before I do this, so that I’m counting species
 </div>
 <div id="check-all-species-assignments-range-confidence-similarity-to-other-species" class="section level2">
 <h2>4. Check all species assignments (range, confidence, similarity to other species)</h2>
-<p>Create a list here of the edits I need to make, then edit the <code>superblast_taxonomy.qza</code> artefact and reload into Qiime to do downstream analyses.</p>
+<p>This is a list of the edits I need to make, then I editted the <code>superblast_taxonomy.qza</code> artefact using the script <code>Taxonomy_edits.Rmd</code> and reloaded into Qiime to do downstream analyses (code for reloading is in the script).</p>
 <div id="sandlances---is-it-possible-to-differentiate-species" class="section level3">
 <h3>Sandlances - is it possible to differentiate species?</h3>
 <p>Making a tree would help to solve this.</p>
@@ -494,7 +494,7 @@ Most of the ROST sandlance sequences match <em>A. personatus</em> but it’s cle
 <li>Group <em>Clupea pallasi</em> (Pacific herring) into <em>Clupea harengus</em> (Atlantic herring). <em>C. pallasi</em> only comes up once in a sample with lots of <em>harengus</em> and so this may be a PCR error.</li>
 <li>Change <em>Sardinops melanostictus</em> (South American pilchard) to <em>Clupea harengus</em>. It is a monotypic genus and only two reads were pulled through in a single sample after rarefying. Could this be contamination from a tropicbird sample? No, it only comes up in one COTE chick sample in the entire dataset. I guess it must be a PCR error then? That sample contains <em>C. harengus</em>, so just adding two sequences to the count for that species should have a very minimal impact on anything.</li>
 <li>Change <em>Etheostoma parvipinne</em> to <em>Etheostomatinae</em> which is a subfamily within the Percidae (darters and logperches) as it’s only a 95% match to the closest species on genback, but there are lots of matches to species within <em>Etheostomatinae.</em></li>
-<li>Change <em>Scomber japonicus</em> to <em>Scomber scomber</em> (Atlantic chub mackerel), which is a 99 or 100% match. The range is fine, they tend to be found in warmer waters than the GoM but the range map does show that they can occur in the GoM. <em>Scomber scombrus</em> (Atlantic mackerel) has a higher occurence in the GoM but is only a 95% match. It was also a 100% match to <em>Scomber australasicus</em> but that is found in the Pacific.</li>
+<li>Change <em>Scomber japonicus</em> to <em>Scomber colias</em> (Atlantic chub mackerel), which is a 99 or 100% match. The range is fine, they tend to be found in warmer waters than the GoM but the range map does show that they can occur in the GoM. <em>Scomber scombrus</em> (Atlantic mackerel) has a higher occurence in the GoM but is only a 95% match. It was also a 100% match to <em>Scomber australasicus</em> but that is found in the Pacific.</li>
 <li>Group all <em>Ammodytes</em> sequences to <em>Ammodytes sp</em>.</li>
 </ol>
 </div>

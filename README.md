@@ -124,7 +124,7 @@ Note, next time I come to run something like this, I should use the scientific n
 
 ## 4. Check all species assignments (range, confidence, similarity to other species)
 
-Create a list here of the edits I need to make, then edit the ```superblast_taxonomy.qza``` artefact and reload into Qiime to do downstream analyses.
+This is a list  of the edits I need to make, then I editted the ```superblast_taxonomy.qza``` artefact using the script ```Taxonomy_edits.Rmd``` and reloaded into Qiime to do downstream analyses (code for reloading is in the script).
 
 ### Sandlances - is it possible to differentiate species?
 
@@ -246,3 +246,21 @@ Most of the ROST sandlance sequences match *A. personatus* but it's clearly not 
 21. *Urophycis regia*, 99-100% match, range is good, but note that the sequence on genbank is only 133 bases long
     + *Urophycis floridan* has a complete sequence in the database, but is only a 95% match and doesn't occur in GoM
 22. *Urophycis tenuis* has 98-100% match, range is good, the next closest species has 91% match
+
+
+
+## 5. Redo the barplots to check the taxonomy edits worked
+
+```
+qiime taxa barplot\
+      --i-table Terns/Terns_table_rarefied400.qza\
+      --i-taxonomy Terns/superblast_taxonomy_edited.qza\
+      --m-metadata-file ../mdat.txt\
+      --o-visualization Terns/Terns_table_rarefied400_editedTaxonomy-barplots.qzv
+```
+Yep, all looks good now.
+
+What's next? Diversity analyses. Seems to be some good stuff on diversity in this tutorial - https://docs.qiime2.org/2020.8/tutorials/pd-mice/
+
+Start there. 
+
