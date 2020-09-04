@@ -609,6 +609,17 @@ Most of the ROST sandlance sequences match <em>A. personatus</em> but it’s cle
 </ol>
 </div>
 </div>
+<div id="redo-the-barplots-to-check-the-taxonomy-edits-worked" class="section level2">
+<h2>5. Redo the barplots to check the taxonomy edits worked</h2>
+<pre><code>qiime taxa barplot\
+      --i-table Terns/Terns_table_rarefied400.qza\
+      --i-taxonomy Terns/superblast_taxonomy_edited.qza\
+      --m-metadata-file ../mdat.txt\
+      --o-visualization Terns/Terns_table_rarefied400_editedTaxonomy-barplots.qzv</code></pre>
+<p>Yep, all looks good now.</p>
+<p>What’s next? Diversity analyses. Seems to be some good stuff on diversity in this tutorial - <a href="https://docs.qiime2.org/2020.8/tutorials/pd-mice/" class="uri">https://docs.qiime2.org/2020.8/tutorials/pd-mice/</a></p>
+<p>Start there.</p>
+</div>
 </div>
 
 
