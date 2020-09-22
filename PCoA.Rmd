@@ -38,7 +38,7 @@ Jaccard_COTE <- read_qza("/Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_
 ```
 
 
-## Plot COTE vs ROST comparisons
+## COTE vs ROST 
 ```{r, warning = FALSE, message = FALSE}
 BrayCurtis_COTE_ROST$data$Vectors %>%
   select(SampleID, PC1, PC2) %>%
@@ -76,7 +76,7 @@ Jaccard_COTE_ROST$data$Vectors %>%
 This is based on Jaccard distances, which do not take into account the relative abundance of each taxon, only presence/absence data. Again, there is some differentiation of COTE and ROST along PC1.
 
 
-## Plot within COTE comparisons
+## COTE Adults vs. Chicks 
 ```{r, warning = FALSE, message = FALSE}
 BrayCurtis_COTE$data$Vectors %>%
   select(SampleID, PC1, PC2) %>%
