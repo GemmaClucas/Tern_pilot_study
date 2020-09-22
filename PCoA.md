@@ -28,7 +28,7 @@ Jaccard_COTE_ROST <- read_qza("/Users/gemmaclucas/Dropbox/Diets_from_poop/2019_t
 Jaccard_COTE <- read_qza("/Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fecal_data_analysis/MiFish/final_taxonomy_superblast/Terns/COTE_Jaccard-PCoA_rarefied400.qza")
 ```
 
-## Plot COTE vs ROST comparisons
+## COTE vs ROST
 
 ``` r
 BrayCurtis_COTE_ROST$data$Vectors %>%
@@ -75,7 +75,7 @@ This is based on Jaccard distances, which do not take into account the
 relative abundance of each taxon, only presence/absence data. Again,
 there is some differentiation of COTE and ROST along PC1.
 
-## Plot within COTE comparisons
+## COTE Adults vs. Chicks
 
 ``` r
 BrayCurtis_COTE$data$Vectors %>%
@@ -106,5 +106,5 @@ Jaccard_COTE$data$Vectors %>%
 
 ![](PCoA_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-Same thing but with Jaccard distances (presence/absence only). Agaib,
+Same thing but with Jaccard distances (presence/absence only). Again,
 not really any differentiation between adults and chicks.
