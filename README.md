@@ -260,7 +260,202 @@ qiime taxa barplot\
 ```
 Yep, all looks good now.
 
-What's next? Diversity analyses. Seems to be some good stuff on diversity in this tutorial - https://docs.qiime2.org/2020.8/tutorials/pd-mice/
 
-Start there. 
+## 6. Alpha diversity analyses
+
+Seems to be some good stuff on diversity in this tutorial - https://docs.qiime2.org/2020.8/tutorials/pd-mice/
+
+
+Also this diversity tutoral looks very useful https://forum.qiime2.org/t/alpha-and-beta-diversity-explanations-and-commands/2282
+
+
+## 7. Beta diversity
+
+I can calculate a Bray-Curtis dissimilaritr matrix, since I have relative abundance data (RRA). I can also calculate the Jaccard distances, but that only takes into account presence absence. 
+
+First, I need to split the data into:   
+1. Just COTEs, so that I can compare between chicks and adults and between years.
+2. COTE and ROST chicks, so that I can compare between species and between years.  
+
+Split the data and create .qzv files to check the filters worked.
+```
+qiime feature-table filter-samples \
+  --i-table Terns/Terns_table_rarefied400.qza \
+  --m-metadata-file ../mdat.txt \
+  --p-where "Species='COTE'" \
+  --o-filtered-table Terns/COTE_table_rarefied400.qza 
+
+qiime feature-table summarize \
+    --i-table Terns/COTE_table_rarefied400.qza \
+    --m-sample-metadata-file ../mdat.txt \
+    --o-visualization Terns/COTE_table_rarefied400
+  
+qiime feature-table filter-samples \
+  --i-table Terns/Terns_table_rarefied400.qza \
+  --m-metadata-file ../mdat.txt \
+  --p-where "Age='chick' AND Species IN ('COTE', 'ROST')" \
+  --o-filtered-table Terns/COTE_ROST_chicks_table_rarefied400.qza
+  
+qiime feature-table summarize \
+  --i-table Terns/COTE_ROST_chicks_table_rarefied400.qza \
+  --m-sample-metadata-file ../mdat.txt \
+  --o-visualization Terns/COTE_ROST_chicks_table_rarefied400
+```
+
+Calculate Bray-Curtis dissimilarity for both datasets.
+```
+qiime diversity beta \
+  --i-table Terns/COTE_table_rarefied400.qza \
+  --p-metric braycurtis \
+  --p-n-jobs 4 \
+  --o-distance-matrix Terns/COTE_Bray-Curtis-matrix_rarefied400.qza
+  
+qiime diversity beta \
+  --i-table Terns/COTE_ROST_chicks_table_rarefied400.qza \
+  --p-metric braycurtis \
+  --p-n-jobs 4 \
+  --o-distance-matrix Terns/COTE_ROST_chicks_Bray-Curtis-matrix_rarefied400.qza
+```
+
+Run PCoA and make emperor plots for both.
+```
+qiime diversity pcoa \
+  --i-distance-matrix Terns/COTE_Bray-Curtis-matrix_rarefied400.qza \
+  --o-pcoa Terns/COTE_Bray-Curtis-PCoA_rarefied400.qza
+  
+qiime emperor plot \
+  --i-pcoa Terns/COTE_Bray-Curtis-PCoA_rarefied400.qza \
+    --m-metadata-file ../mdat.txt \
+    --o-visualization Terns/COTE_Bray-Curtis-EmperorPlot_rarefied400  
+  
+qiime diversity pcoa \
+  --i-distance-matrix Terns/COTE_ROST_chicks_Bray-Curtis-matrix_rarefied400.qza \
+  --o-pcoa Terns/COTE_ROST_chicks_Bray-Curtis-PCoA_rarefied400.qza
+  
+qiime emperor plot \
+  --i-pcoa Terns/COTE_ROST_chicks_Bray-Curtis-PCoA_rarefied400.qza \
+    --m-metadata-file ../mdat.txt \
+    --o-visualization Terns/COTE_ROST_chicks_Bray-Curtis-EmperorPlot_rarefied400
+
+```
+
+These don't really show any convincing clustering, either in the comparison among adult and chick terns, nor between Roseate and Common Tern chicks. 
+
+Do all the same steps but with Jaccard distances:
+```
+qiime diversity beta \
+  --i-table Terns/COTE_table_rarefied400.qza \
+  --p-metric jaccard \
+  --p-n-jobs 4 \
+  --o-distance-matrix Terns/COTE_Jaccard-matrix_rarefied400.qza
+  
+qiime diversity beta \
+  --i-table Terns/COTE_ROST_chicks_table_rarefied400.qza \
+  --p-metric jaccard \
+  --p-n-jobs 4 \
+  --o-distance-matrix Terns/COTE_ROST_chicks_Jaccard-matrix_rarefied400.qza
+  
+qiime diversity pcoa \
+  --i-distance-matrix Terns/COTE_Jaccard-matrix_rarefied400.qza \
+  --o-pcoa Terns/COTE_Jaccard-PCoA_rarefied400.qza
+  
+qiime emperor plot \
+  --i-pcoa Terns/COTE_Jaccard-PCoA_rarefied400.qza \
+    --m-metadata-file ../mdat.txt \
+    --o-visualization Terns/COTE_Jaccard-EmperorPlot_rarefied400  
+  
+qiime diversity pcoa \
+  --i-distance-matrix Terns/COTE_ROST_chicks_Jaccard-matrix_rarefied400.qza \
+  --o-pcoa Terns/COTE_ROST_chicks_Jaccard-PCoA_rarefied400.qza
+  
+qiime emperor plot \
+  --i-pcoa Terns/COTE_ROST_chicks_Jaccard-PCoA_rarefied400.qza \
+    --m-metadata-file ../mdat.txt \
+    --o-visualization Terns/COTE_ROST_chicks_Jaccard-EmperorPlot_rarefied400
+```
+
+Plot the PCoAs in R, as emperor plots are horrible -> go to script ```PCoA.Rmd```
+
+### 8. PERMANOVA to test for statistical significance of between group distances for COTEs
+
+Testing whether the diets of COTE adults vs chicks differ, using Bray-Curtis dissimilarity and Jaccard distances.
+```
+qiime diversity beta-group-significance \
+  --i-distance-matrix Terns/COTE_Bray-Curtis-matrix_rarefied400.qza \
+  --m-metadata-file ../mdat.txt \
+  --m-metadata-column Age \
+  --o-visualization Terns/COTE_Bray-Curtis-significance.qzv
+  
+qiime diversity beta-group-significance \
+  --i-distance-matrix Terns/COTE_Jaccard-matrix_rarefied400.qza \
+  --m-metadata-file ../mdat.txt \
+  --m-metadata-column Age \
+  --o-visualization Terns/COTE_Jaccard-significance.qzv
+```
+
+The p value is 0.011 for Bray-Curtis and < 0.001 for Jaccard, but is this due to differences in the disperson (community structure) of the data? This can cause a significant result:
+
+>"A significant difference in PERMANOVA can reflect a large difference between the group or differences in variances within a group. This means that we might see a statistically significant difference even if it’s caused by variation within one group. Distance boxplots can help give a visual sense of this, but it’s nice to use a statistical test to confirm this. We can use the permdisp to help rule out differences due to a high degree of dispersion (within-group variance) in one of the groups of interest."
+
+It's difficult to tell whether there are differences in dispersion from the boxplots because the maximum distance between points with the Bray-Crutis or Jaccard index is 1, and all the distances are clustered around 1. Instead of using PERMANOVA, you can use the ```permdisp``` method which tests for differences in dispersion between groups (paper: https://pubmed.ncbi.nlm.nih.gov/16706913/).
+
+Repeat the group significance testing with the ```permdisp``` method:
+```
+qiime diversity beta-group-significance \
+  --i-distance-matrix Terns/COTE_Bray-Curtis-matrix_rarefied400.qza \
+  --m-metadata-file ../mdat.txt \
+  --m-metadata-column Age \
+  --o-visualization Terns/COTE_Bray-Curtis-significance_permdisp.qzv \
+  --p-method permdisp
+  
+qiime diversity beta-group-significance \
+  --i-distance-matrix Terns/COTE_Jaccard-matrix_rarefied400.qza \
+  --m-metadata-file ../mdat.txt \
+  --m-metadata-column Age \
+  --o-visualization Terns/COTE_Jaccard-significance_permdisp.qzv \
+  --p-method permdisp
+```
+
+The ```permdisp``` method finds no differences in dispersion for either the Bray-Curtis (p = 0.389) or the Jaccard (p = 0.695) dissimilarity scores between COTE chicks and adults. 
+
+But this means the siginificant differences found by the PERMANOVA cannot be down to differences in the dispersion of the data. How to explain this when the differences are not obvious from the PCoA?
+
+
+### 9. PERMANOVA to test for statistical significance between COTE and ROST
+
+```
+qiime diversity beta-group-significance \
+  --i-distance-matrix Terns/COTE_ROST_chicks_Bray-Curtis-matrix_rarefied400.qza \
+  --m-metadata-file ../mdat.txt \
+  --m-metadata-column Species \
+  --o-visualization Terns/COTE_ROST_chicks_Bray-Curtis-significance.qzv
+  
+qiime diversity beta-group-significance \
+  --i-distance-matrix Terns/COTE_ROST_chicks_Jaccard-matrix_rarefied400.qza \
+  --m-metadata-file ../mdat.txt \
+  --m-metadata-column Species \
+  --o-visualization Terns/COTE_ROST_chicks_Jaccard-significance.qzv
+```
+
+There is a significant difference between COTE and ROST diets. Based on the Bray-Curtis dissimilarity, the PERMANOVA is significant (p < 0.001) and also for the Jaccard index (p < 0.001).  
+
+Check whether this is due to differences in dispersion.
+
+```
+qiime diversity beta-group-significance \
+  --i-distance-matrix Terns/COTE_ROST_chicks_Bray-Curtis-matrix_rarefied400.qza \
+  --m-metadata-file ../mdat.txt \
+  --m-metadata-column Species \
+  --o-visualization Terns/COTE_ROST_chicks_Bray-Curtis-significance_permdisp.qzv \
+  --p-method permdisp
+  
+qiime diversity beta-group-significance \
+  --i-distance-matrix Terns/COTE_ROST_chicks_Jaccard-matrix_rarefied400.qza \
+  --m-metadata-file ../mdat.txt \
+  --m-metadata-column Species \
+  --o-visualization Terns/COTE_ROST_chicks_Jaccard-significance_permdisp.qzv \
+  --p-method permdisp
+```
+
+Here, the results from the ```permdisp``` method are significant for both Bray-Curtis (p = 0.001) and Jaccard index (p < 0.001). How do we interpret these results? Is this really the right way to go about things, or should I try to calculate Pianka's niche overlap scores instead?
 
