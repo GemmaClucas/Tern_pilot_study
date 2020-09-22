@@ -777,7 +777,32 @@ qiime diversity beta-group-significance \
   --m-metadata-column Species \
   --o-visualization Terns/COTE_ROST_chicks_Jaccard-significance_permdisp.qzv \
   --p-method permdisp</code></pre>
-<p>Here, the results from the <code>permdisp</code> method are significant for both Bray-Curtis (p = 0.001) and Jaccard index (p &lt; 0.001)</p>
+<p>Here, the results from the <code>permdisp</code> method are significant for both Bray-Curtis (p = 0.001) and Jaccard index (p &lt; 0.001). How do we interpret these results? Is this really the right way to go about things, or should I try to calculate Pianka’s niche overlap scores instead?</p>
+</div>
+<div id="alpha-divrsity" class="section level3">
+<h3>10. Alpha divrsity</h3>
+<p>Calculate alpha diversity using the Shannon index for all samples in both datasets:</p>
+<pre><code>qiime diversity alpha \
+  --i-table Terns/COTE_table_rarefied400.qza \
+  --p-metric shannon \
+  --o-alpha-diversity Terns/COTE_shannon.qza
+  
+  
+qiime diversity alpha \
+  --i-table Terns/COTE_ROST_chicks_table_rarefied400.qza \
+  --p-metric shannon \
+  --o-alpha-diversity Terns/COTE_ROST_chicks_shannon.qza</code></pre>
+<p>Then create artefacts for vizualising among-group differences:</p>
+<pre><code>qiime diversity alpha-group-significance \
+  --i-alpha-diversity Terns/COTE_shannon.qza \
+  --m-metadata-file ../mdat.txt \
+  --o-visualization Terns/COTE_shannon.qzv
+  
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity Terns/COTE_ROST_chicks_shannon.qza \
+  --m-metadata-file ../mdat.txt \
+  --o-visualization Terns/COTE_ROST_chicks_shannon.qzv  
+</code></pre>
 </div>
 </div>
 </div>

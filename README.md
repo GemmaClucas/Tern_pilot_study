@@ -459,3 +459,34 @@ qiime diversity beta-group-significance \
 
 Here, the results from the ```permdisp``` method are significant for both Bray-Curtis (p = 0.001) and Jaccard index (p < 0.001). How do we interpret these results? Is this really the right way to go about things, or should I try to calculate Pianka's niche overlap scores instead?
 
+### 10. Alpha divrsity
+
+Calculate alpha diversity using the Shannon index for all samples in both datasets:
+
+```
+qiime diversity alpha \
+  --i-table Terns/COTE_table_rarefied400.qza \
+  --p-metric shannon \
+  --o-alpha-diversity Terns/COTE_shannon.qza
+  
+  
+qiime diversity alpha \
+  --i-table Terns/COTE_ROST_chicks_table_rarefied400.qza \
+  --p-metric shannon \
+  --o-alpha-diversity Terns/COTE_ROST_chicks_shannon.qza
+```
+
+Then create artefacts for vizualising among-group differences:
+
+```
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity Terns/COTE_shannon.qza \
+  --m-metadata-file ../mdat.txt \
+  --o-visualization Terns/COTE_shannon.qzv
+  
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity Terns/COTE_ROST_chicks_shannon.qza \
+  --m-metadata-file ../mdat.txt \
+  --o-visualization Terns/COTE_ROST_chicks_shannon.qzv  
+
+```
