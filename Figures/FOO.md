@@ -138,11 +138,7 @@ COTE_chicks_2017 <- df %>%
 n_samples <- nrow(COTE_chicks_2017)
 
 FOO <- calc_FOO(COTE_chicks_2017)
-```
 
-    ## No id variables; using all as measure variables
-
-``` r
 FOO$Species <- scrub_periods(FOO)
 
 plot_FOO(FOO)
@@ -162,11 +158,7 @@ COTE_chicks_2018 <- df %>%
 n_samples <- nrow(COTE_chicks_2018)
 
 FOO <- calc_FOO(COTE_chicks_2018)
-```
 
-    ## No id variables; using all as measure variables
-
-``` r
 FOO$Species <- scrub_periods(FOO)
 
 plot_FOO(FOO)
@@ -186,11 +178,7 @@ ROST_chicks_2017 <- df %>%
 n_samples <- nrow(ROST_chicks_2017)
 
 FOO <- calc_FOO(ROST_chicks_2017)
-```
 
-    ## No id variables; using all as measure variables
-
-``` r
 FOO$Species <- scrub_periods(FOO)
 
 plot_FOO(FOO)
@@ -210,14 +198,64 @@ ROST_chicks_2018 <- df %>%
 n_samples <- nrow(ROST_chicks_2018)
 
 FOO <- calc_FOO(ROST_chicks_2018)
-```
 
-    ## No id variables; using all as measure variables
-
-``` r
 FOO$Species <- scrub_periods(FOO)
 
 plot_FOO(FOO)
 ```
 
 ![](FOO_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+### Plotting them all together on one, multipanel figure
+
+I think I can use faceting to do this, but I need to combine all the FOO
+data together into one dataframe. First, save the FOO data for each
+group.
+
+``` r
+FOO_COTE_chicks_2017 <- calc_FOO(COTE_chicks_2017)
+FOO_COTE_chicks_2017$Year <- "2017"
+FOO_COTE_chicks_2017$BirdSpecies <- "COTE"
+FOO_COTE_chicks_2017$Age <- "chick"
+
+FOO_COTE_chicks_2018 <- calc_FOO(COTE_chicks_2018)
+FOO_COTE_chicks_2018$Year <- "2018"
+FOO_COTE_chicks_2018$BirdSpecies <- "COTE"
+FOO_COTE_chicks_2018$Age <- "chick"
+
+FOO_ROST_chicks_2017 <- calc_FOO(ROST_chicks_2017)
+FOO_ROST_chicks_2017$Year <- "2017"
+FOO_ROST_chicks_2017$BirdSpecies <- "ROST"
+FOO_ROST_chicks_2017$Age <- "chick"
+
+FOO_ROST_chicks_2018 <- calc_FOO(ROST_chicks_2018)
+FOO_ROST_chicks_2018$Year <- "2018"
+FOO_ROST_chicks_2018$BirdSpecies <- "ROST"
+FOO_ROST_chicks_2018$Age <- "chick"
+```
+
+Use row binding to add all the dataframes together and use faceting to
+plot.
+
+``` r
+All_FOO <- FOO_COTE_chicks_2017 %>% 
+  bind_rows(., FOO_COTE_chicks_2018) %>% 
+  bind_rows(., FOO_ROST_chicks_2017) %>% 
+  bind_rows(., FOO_ROST_chicks_2018) 
+
+All_FOO$Species <- scrub_periods(All_FOO)
+
+All_FOO %>% 
+  ggplot() +
+  geom_bar(aes(x = Species, y = FOO, fill = Species), stat = "identity") +
+  facet_grid(rows = vars(Year), cols = vars(BirdSpecies)) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45,  hjust=1)) +
+  labs(y = "Frequency of occurrence (%)") +
+  scale_fill_manual(values = Species_colours,
+                    breaks = Species_ordered,
+                    labels = Species_ordered) +
+  theme(legend.position = "none") 
+```
+
+![](FOO_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
