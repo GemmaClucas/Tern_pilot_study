@@ -1,0 +1,119 @@
+---
+title: "Pianka's Niche Overlap"
+author: "Gemma Clucas"
+date: "10/6/2020"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(EcoSimR)
+```
+
+I'm following guidelines found in [this](https://cran.r-project.org/web/packages/EcoSimR/vignettes/nicheOverlapVignette.html) vignette. In there, they recommend the default algorithm ```ra3``` for shuffling row values to test significance.
+
+### Read in the rarefied feature table
+
+This is the same csv that I made for the ```FOO.Rmd``` script.
+
+```{r data}
+df <- read.csv("/Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fecal_data_analysis/MiFish/final_taxonomy_superblast/Terns/Terns_table_rarefied400_withtaxonomyedits.csv", header = TRUE) %>% 
+  mutate(Year = as.factor(Year)) %>% 
+  rename(River.herring = River.Herring,
+         Sandlance = Sandlances,
+         Mummichog = Mummichig)
+```
+
+### Create matrix to calculate niche overlap for COTEs
+
+The function needs species (or in this case age groups) as rows and the prey items in columns. It will determine the proportion for each prey item, so it is fine to give it just the number of detections for each prey item for now.
+
+I have lumped the data for 2017 and 2018 together, so that the test is just between adult and chick diets (years are not considered).
+
+Select the data and calculate number of detections of each prey species:
+```{r, message=FALSE, warning=FALSE }
+COTE <- df %>% 
+  dplyr::select(River.herring:White.hake, Species, Age) %>%    # keep just the columns of interest
+  group_by(Species, Age) %>%                            
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%                           # change to detection/non-detection
+  summarise_each(funs = sum) %>%                                    # sum up number of detections within in each group
+  filter(Species == "COTE") %>%                                     
+  mutate(group = paste(Species, Age, sep = "_")) %>%          # make new "group" name for each row
+  ungroup() %>% 
+  dplyr::select(group, River.herring:White.hake)
+
+knitr::kable(COTE)  
+```
+
+### Calculate Pianka's niche overlap on the COTE matrix
+
+To calculate just the score, you can use the ```pianka()``` function.
+```{r}
+COTE %>% dplyr::select(River.herring:White.hake) %>% 
+  pianka()
+```
+
+To do simulations to caluclate significance, you can use the ```niche_null_model()``` function.
+```{r}
+COTE_pianka <- COTE %>% niche_null_model(nReps=5000, algo = "ra3", metric = "pianka")
+
+summary(COTE_pianka)
+
+```
+
+Plot a histogram to see where the observed metric falls against the simulated data.
+```{r}
+plot(COTE_pianka, type = "hist")
+```
+
+This shows that there is much higher overlap than expected by chance. The observed overlap of `r COTE %>% dplyr::select(River.herring:White.hake) %>% pianka()` is well outside of the 95% confidence interval, which is denoted by the short dashed lines.
+
+### Overlap between COTE and ROST chick diets.
+
+Create a table with the FOO for COTE and ROST chicks (years are grouped).
+
+```{r, message=FALSE, warning=FALSE}
+COTE_ROST <- df %>% 
+  dplyr::select(River.herring:White.hake, Species, Age) %>%    # keep just the columns of interest
+  group_by(Species, Age) %>%                            
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%                           # change to detection/non-detection
+  summarise_each(funs = sum) %>%                                    # sum up number of detections within in each group
+  filter(Species == "COTE" | Species == "ROST") %>% 
+  filter(Age == "chick") %>% 
+  mutate(group = paste(Species, Age, sep = "_")) %>%          # make new "group" name for each row
+  ungroup() %>% 
+  dplyr::select(group, River.herring:White.hake)
+
+knitr::kable(COTE_ROST) 
+```
+
+Calculate the niche overlap and estimate 95% confidence interval, then plot.
+```{r}
+COTE_ROST_pianka <- COTE_ROST %>% niche_null_model(nReps=5000, algo = "ra3", metric = "pianka")
+
+summary(COTE_ROST_pianka)
+
+plot(COTE_ROST_pianka, type = "hist")
+```
+
+The observed niche overlap of `r COTE_ROST %>% dplyr::select(River.herring:White.hake) %>% pianka()` between Common and Roseate terns is outside the 95% confidence interval, and so despite differences in diets, they do not have a statistically differentiated niche according to Pianka's Niche Overlap.
+
+
+### Check that it's working by simulating random data
+
+```{r}
+#create a random data set with uniform (0,1) values
+myRandomData <- matrix(runif(300), nrow=30)
+
+# run null model with czekanowski index and ra1, 5000 replications
+myRandomModel <- niche_null_model(speciesData=myRandomData, 
+                            algo="ra3", metric="pianka", 
+                            suppressProg=TRUE,nReps=5000)
+
+# print summary of model and plot histogram
+summary(myRandomModel)
+plot(myRandomModel,type="hist")
+```
+
+Yes, this time the simulated metric is inside the 95% CI.

@@ -459,7 +459,7 @@ qiime diversity beta-group-significance \
 
 Here, the results from the ```permdisp``` method are significant for both Bray-Curtis (p = 0.001) and Jaccard index (p < 0.001). How do we interpret these results? Is this really the right way to go about things, or should I try to calculate Pianka's niche overlap scores instead?
 
-### 10. Alpha divrsity
+### 10. Alpha diversity
 
 Calculate alpha diversity using the Shannon index for all samples in both datasets:
 
@@ -490,3 +490,15 @@ qiime diversity alpha-group-significance \
   --o-visualization Terns/COTE_ROST_chicks_shannon.qzv  
 
 ```
+
+### 11. Plotting frequency of occurrence for COTE/ROST comparisons
+
+This is done in the script ```FOO.Rmd``` and the results are saved in the ```Figures``` folder.
+
+### 12. Pianka's niche overlap
+
+I want to statistically compare the diets of Common and Roseate tern chicks, and also the diets of adult and chick Common terns. 
+
+Lopes et al 2020 [Ecological specialziation and niche overlap of subterranean rodents inferred from DNA metabarcoding diet analysis](https://olinelibrary.wiley.com/doi/full/10.1111/mec.15549?casa_token=Sr3yYqd0-UsAAAAA%3Amf0K_KBirSIT45xWvNx4yhE6rYuSBcyOTsyTegC4i9rIOqNRtv0kSWM61obcXMjPSIlOIEhOYNl7) uses [Pianka's index of niche overlap](https://cran.r-project.org/web/packages/EcoSimR/vignettes/nicheOverlapVignette.html) to test whether the diets of many species of mice overlap. It seems to just use a matrix with species as rows and diet items as columns and it takes into account the proportion of each diet item that is eaten. The ```EcoSimR``` packages implements this method and uses simulations to estimate the null distribution by shuffling the row values of the matrix.
+
+For these calculations, see ```Piankas_niche_overlap.Rmd```.

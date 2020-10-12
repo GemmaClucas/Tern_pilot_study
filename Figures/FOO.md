@@ -40,6 +40,7 @@ Species_ordered <-  c("Atlantic herring",
                       "Atlantic butterfish",
                       "Cunner",
                       "Acadian redfish",
+                      "Mummichog",
                       "Atlantic silverside",
                       "Atlantic tomcod",
                       "Spotted codling",
@@ -52,8 +53,7 @@ Species_ordered <-  c("Atlantic herring",
                       "Saithe",
                       "Tautog",
                       "Darter sp",
-                      "Red lionfish",
-                      "Mummichog")
+                      "Red lionfish")
 
 # Define colour palette - HAVEN'T FINISHED AS THIS WILL CHANGE DEPENDING ON PLOTTING ORDER
 Species_colours <- c(rgb(98, 64, 18, max = 255),
@@ -82,6 +82,33 @@ Species_colours <- c(rgb(98, 64, 18, max = 255),
                      rgb(150,   102,    34  , max = 255),
                      rgb(150,   102,    34  , max = 255),
                      rgb(150,   102,    34  , max = 255))
+
+Species_with_colours <- c("Atlantic herring" = rgb(98, 64, 18, max = 255),
+                      "River herring" = rgb(150,    102,    34  , max = 255),
+                      "Sandlance" = rgb(207,    138,    54  , max = 255),
+                      "White hake" = rgb(247,   224,    167 , max = 255),
+                      "Silver hake" = rgb(225,  204,    150 , max = 255),
+                      "Red hake" = rgb(187, 169,    126 , max = 255),
+                      "Fourbeard rockling" = rgb(214,   237,    234 , max = 255),
+                      "Haddock" = rgb(159,  211,    204 , max = 255),
+                      "Atlantic mackerel" = rgb(92, 164,    160 , max = 255),
+                      "Atlantic butterfish" = rgb(50,   118,    113     , max = 255),
+                      "Cunner" = rgb(30,    75,  63     , max = 255),
+                      "Acadian redfish" = rgb(5,    60, 245     , max = 255),
+                      "Mummichog" = rgb(5,  57, 237     , max = 255),
+                      "Atlantic silverside" = rgb(6,    56, 234     , max = 255),
+                      "Atlantic tomcod" = rgb(3,    46, 199     , max = 255),
+                      "Spotted codling" = rgb(150,  102,    34  , max = 255),
+                      "Three spined stickleback" = rgb(150, 102,    34  , max = 255),
+                      "Radiated shanny" = rgb(150,  102,    34  , max = 255),
+                      "American angler" = rgb(150,  102,    34  , max = 255),
+                      "Atlantic cod" = rgb(150, 102,    34  , max = 255),
+                      "Black spotted stickleback" = rgb(150,    102,    34  , max = 255),
+                      "Nine spine stickleback" = rgb(150,   102,    34  , max = 255),
+                      "Saithe" = rgb(150,   102,    34  , max = 255),
+                      "Tautog" = rgb(150,   102,    34  , max = 255),
+                      "Darter sp" = rgb(150,    102,    34  , max = 255),
+                      "Red lionfish" = rgb(150, 102,    34  , max = 255))
 ```
 
 ### Functions to calculate FOO from filtered feature table and plot FOO
@@ -141,7 +168,9 @@ FOO <- calc_FOO(COTE_chicks_2017)
 
 FOO$Species <- scrub_periods(FOO)
 
-plot_FOO(FOO)
+FOO %>% 
+  filter(FOO > 0) %>% 
+  plot_FOO()
 ```
 
 ![](FOO_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
@@ -161,7 +190,9 @@ FOO <- calc_FOO(COTE_chicks_2018)
 
 FOO$Species <- scrub_periods(FOO)
 
-plot_FOO(FOO)
+FOO %>% 
+  filter(FOO > 0) %>% 
+  plot_FOO()
 ```
 
 ![](FOO_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
@@ -181,7 +212,9 @@ FOO <- calc_FOO(ROST_chicks_2017)
 
 FOO$Species <- scrub_periods(FOO)
 
-plot_FOO(FOO)
+FOO %>% 
+  filter(FOO > 0) %>% 
+  plot_FOO()
 ```
 
 ![](FOO_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
@@ -201,7 +234,9 @@ FOO <- calc_FOO(ROST_chicks_2018)
 
 FOO$Species <- scrub_periods(FOO)
 
-plot_FOO(FOO)
+FOO %>% 
+  filter(FOO > 0) %>% 
+  plot_FOO()
 ```
 
 ![](FOO_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
@@ -234,8 +269,8 @@ FOO_ROST_chicks_2018$BirdSpecies <- "ROST"
 FOO_ROST_chicks_2018$Age <- "chick"
 ```
 
-Use row binding to add all the dataframes together and use faceting to
-plot.
+Use row binding to add all the dataframes together so that I can use
+faceting to plot.
 
 ``` r
 All_FOO <- FOO_COTE_chicks_2017 %>% 
@@ -244,13 +279,22 @@ All_FOO <- FOO_COTE_chicks_2017 %>%
   bind_rows(., FOO_ROST_chicks_2018) 
 
 All_FOO$Species <- scrub_periods(All_FOO)
+```
 
+I want to get rid of species that have zero FOO in all groups, so I can
+do this by grouping by species and then filtering out species where FOO
+= 0.
+
+``` r
 All_FOO %>% 
+  group_by(Species) %>% 
+  filter(FOO > 0) %>% 
   ggplot() +
   geom_bar(aes(x = Species, y = FOO, fill = Species), stat = "identity") +
   facet_grid(rows = vars(Year), cols = vars(BirdSpecies)) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 45,  hjust=1)) +
+  theme(axis.text.x = element_text(angle = 45,  hjust=1),
+        panel.border=element_rect(colour="black",size=1, fill = NA)) +
   labs(y = "Frequency of occurrence (%)") +
   scale_fill_manual(values = Species_colours,
                     breaks = Species_ordered,
@@ -258,4 +302,4 @@ All_FOO %>%
   theme(legend.position = "none") 
 ```
 
-![](FOO_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](FOO_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
