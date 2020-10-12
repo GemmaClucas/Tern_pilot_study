@@ -21,7 +21,9 @@ df <- read.csv("/Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fe
          Mummichog = Mummichig)
 ```
 
-### Create matrix to calculate niche overlap for COTEs
+## Niche overlap between Common Tern adults and chicks
+
+### Create matrix
 
 The function needs species (or in this case age groups) as rows and the
 prey items in columns. It will determine the proportion for each prey
@@ -77,25 +79,25 @@ COTE_pianka <- COTE %>% niche_null_model(nReps=5000, algo = "ra3", metric = "pia
 summary(COTE_pianka)
 ```
 
-    ## Time Stamp:  Mon Oct 12 15:17:39 2020 
+    ## Time Stamp:  Mon Oct 12 15:35:08 2020 
     ## Reproducible:  FALSE 
     ## Number of Replications:  5000 
-    ## Elapsed Time:  0.88 secs 
+    ## Elapsed Time:  0.82 secs 
     ## Metric:  pianka 
     ## Algorithm:  ra3 
     ## Observed Index:  0.86102 
-    ## Mean Of Simulated Index:  0.31603 
-    ## Variance Of Simulated Index:  0.018255 
-    ## Lower 95% (1-tail):  0.13853 
-    ## Upper 95% (1-tail):  0.58967 
-    ## Lower 95% (2-tail):  0.12016 
-    ## Upper 95% (2-tail):  0.65443 
-    ## Lower-tail P >  0.9998 
-    ## Upper-tail P <  2e-04 
-    ## Observed metric > 5000 simulated metrics 
-    ## Observed metric < 0 simulated metrics 
+    ## Mean Of Simulated Index:  0.31594 
+    ## Variance Of Simulated Index:  0.018551 
+    ## Lower 95% (1-tail):  0.13884 
+    ## Upper 95% (1-tail):  0.59208 
+    ## Lower 95% (2-tail):  0.11985 
+    ## Upper 95% (2-tail):  0.65474 
+    ## Lower-tail P =  0.9998 
+    ## Upper-tail P =  2e-04 
+    ## Observed metric > 4999 simulated metrics 
+    ## Observed metric < 1 simulated metrics 
     ## Observed metric = 0 simulated metrics 
-    ## Standardized Effect Size (SES):  4.0337
+    ## Standardized Effect Size (SES):  4.002
 
 Plot a histogram to see where the observed metric falls against the
 simulated
@@ -111,7 +113,7 @@ This shows that there is much higher overlap than expected by chance.
 The observed overlap of 0.8610201 is well outside of the 95% confidence
 interval, which is denoted by the short dashed lines.
 
-### Overlap between COTE and ROST chick diets.
+## Niche overlap between Common and Roseate tern chicks
 
 Create a table with the FOO for COTE and ROST chicks (years are
 grouped).
@@ -149,25 +151,25 @@ COTE_ROST_pianka <- COTE_ROST %>% niche_null_model(nReps=5000, algo = "ra3", met
 summary(COTE_ROST_pianka)
 ```
 
-    ## Time Stamp:  Mon Oct 12 15:17:40 2020 
+    ## Time Stamp:  Mon Oct 12 15:35:09 2020 
     ## Reproducible:  FALSE 
     ## Number of Replications:  5000 
-    ## Elapsed Time:  0.86 secs 
+    ## Elapsed Time:  0.82 secs 
     ## Metric:  pianka 
     ## Algorithm:  ra3 
     ## Observed Index:  0.6847 
-    ## Mean Of Simulated Index:  0.23042 
-    ## Variance Of Simulated Index:  0.022814 
-    ## Lower 95% (1-tail):  0.060835 
-    ## Upper 95% (1-tail):  0.55733 
-    ## Lower 95% (2-tail):  0.049446 
-    ## Upper 95% (2-tail):  0.61667 
-    ## Lower-tail P =  0.9904 
-    ## Upper-tail P =  0.0096 
-    ## Observed metric > 4952 simulated metrics 
-    ## Observed metric < 48 simulated metrics 
+    ## Mean Of Simulated Index:  0.22944 
+    ## Variance Of Simulated Index:  0.022409 
+    ## Lower 95% (1-tail):  0.058832 
+    ## Upper 95% (1-tail):  0.55535 
+    ## Lower 95% (2-tail):  0.047095 
+    ## Upper 95% (2-tail):  0.62067 
+    ## Lower-tail P =  0.991 
+    ## Upper-tail P =  0.009 
+    ## Observed metric > 4955 simulated metrics 
+    ## Observed metric < 45 simulated metrics 
     ## Observed metric = 0 simulated metrics 
-    ## Standardized Effect Size (SES):  3.0076
+    ## Standardized Effect Size (SES):  3.0411
 
 ``` r
 plot(COTE_ROST_pianka, type = "hist")
@@ -186,7 +188,7 @@ to Pianka’s Niche Overlap.
 #create a random data set with uniform (0,1) values
 myRandomData <- matrix(runif(300), nrow=30)
 
-# run null model with czekanowski index and ra1, 5000 replications
+# run null model with pianka index and ra3, 5000 replications
 myRandomModel <- niche_null_model(speciesData=myRandomData, 
                             algo="ra3", metric="pianka", 
                             suppressProg=TRUE,nReps=5000)
@@ -195,25 +197,25 @@ myRandomModel <- niche_null_model(speciesData=myRandomData,
 summary(myRandomModel)
 ```
 
-    ## Time Stamp:  Mon Oct 12 15:17:52 2020 
+    ## Time Stamp:  Mon Oct 12 15:35:23 2020 
     ## Reproducible:  FALSE 
     ## Number of Replications:  5000 
-    ## Elapsed Time:  12 secs 
+    ## Elapsed Time:  14 secs 
     ## Metric:  pianka 
     ## Algorithm:  ra3 
-    ## Observed Index:  0.73529 
-    ## Mean Of Simulated Index:  0.73825 
-    ## Variance Of Simulated Index:  1.6538e-05 
-    ## Lower 95% (1-tail):  0.73269 
-    ## Upper 95% (1-tail):  0.74576 
-    ## Lower 95% (2-tail):  0.73204 
-    ## Upper 95% (2-tail):  0.74787 
-    ## Lower-tail P =  0.2514 
-    ## Upper-tail P =  0.7486 
-    ## Observed metric > 1257 simulated metrics 
-    ## Observed metric < 3743 simulated metrics 
+    ## Observed Index:  0.74138 
+    ## Mean Of Simulated Index:  0.74381 
+    ## Variance Of Simulated Index:  1.6582e-05 
+    ## Lower 95% (1-tail):  0.7383 
+    ## Upper 95% (1-tail):  0.75132 
+    ## Lower 95% (2-tail):  0.73761 
+    ## Upper 95% (2-tail):  0.75333 
+    ## Lower-tail P =  0.306 
+    ## Upper-tail P =  0.694 
+    ## Observed metric > 1530 simulated metrics 
+    ## Observed metric < 3470 simulated metrics 
     ## Observed metric = 0 simulated metrics 
-    ## Standardized Effect Size (SES):  -0.72638
+    ## Standardized Effect Size (SES):  -0.59585
 
 ``` r
 plot(myRandomModel,type="hist")

@@ -25,7 +25,8 @@ df <- read.csv("/Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fe
          Mummichog = Mummichig)
 ```
 
-### Create matrix to calculate niche overlap for COTEs
+## Niche overlap between Common Tern adults and chicks 
+### Create matrix 
 
 The function needs species (or in this case age groups) as rows and the prey items in columns. It will determine the proportion for each prey item, so it is fine to give it just the number of detections for each prey item for now.
 
@@ -69,7 +70,7 @@ plot(COTE_pianka, type = "hist")
 
 This shows that there is much higher overlap than expected by chance. The observed overlap of `r COTE %>% dplyr::select(River.herring:White.hake) %>% pianka()` is well outside of the 95% confidence interval, which is denoted by the short dashed lines.
 
-### Overlap between COTE and ROST chick diets.
+## Niche overlap between Common and Roseate tern chicks 
 
 Create a table with the FOO for COTE and ROST chicks (years are grouped).
 
@@ -106,7 +107,7 @@ The observed niche overlap of `r COTE_ROST %>% dplyr::select(River.herring:White
 #create a random data set with uniform (0,1) values
 myRandomData <- matrix(runif(300), nrow=30)
 
-# run null model with czekanowski index and ra1, 5000 replications
+# run null model with pianka index and ra3, 5000 replications
 myRandomModel <- niche_null_model(speciesData=myRandomData, 
                             algo="ra3", metric="pianka", 
                             suppressProg=TRUE,nReps=5000)
