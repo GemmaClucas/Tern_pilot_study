@@ -457,9 +457,44 @@ qiime diversity beta-group-significance \
   --p-method permdisp
 ```
 
-Here, the results from the ```permdisp``` method are significant for both Bray-Curtis (p = 0.001) and Jaccard index (p < 0.001). How do we interpret these results? Is this really the right way to go about things, or should I try to calculate Pianka's niche overlap scores instead?
+Here, the results from the ```permdisp``` method are significant for both Bray-Curtis (p = 0.001) and Jaccard index (p < 0.001). How do we interpret these results? In the Qiime microbiome workshop, they Merhbod mentioned that differences in dispersion can be due to differences in the structure of the data and sample sizes can sometimes cause this. However, the samples sizes for COTE and ROST chicks are pretty similar, so I'm not sure what could be causing this.
 
-## 10. Alpha diversity
+You can do beta diversity significance testing in a multivariate framework... 
+
+## 10. Testing beta-divserity significance in a multivariate framework
+
+This can be achieved by the [adonis](https://docs.qiime2.org/2020.8/plugins/available/diversity/adonis/?highlight=adonis) plugin in Qiime. From the docs:
+
+> Determine whether groups of samples are significantly different from one another using the ADONIS permutation-based statistical test in vegan-R. The function partitions sums of squares of a multivariate data set, and is directly analogous to MANOVA (multivariate analysis of variance). This action differs from beta_group_significance in that it accepts R formulae to perform multi-way ADONIS tests; beta_group_signficance only performs one-way tests.
+
+I am only running this on the Bray-Curtis distance matrix for now.
+```
+qiime diversity adonis \
+  --i-distance-matrix Terns/COTE_ROST_chicks_Bray-Curtis-matrix_rarefied400.qza \
+  --m-metadata-file ../mdat.txt \
+  --p-formula Species+Year \
+  --p-permutations 999 \
+  --p-n-jobs 4 \
+  --o-visualization Terns/COTE_ROST_chicks_Bray-Curtis-adonis.qzv 
+```
+
+This shows that there is a significant difference in the diets of Common and Roseate Tern chicks (F = 18.3, df = 1, p < 0.001) and there are differences between years (F = 9.27, df = 1, p < 0.001), but the variance explained by each factor is small (R^2 = 0.098 and R^2 = 0.049, respectively).  
+
+What about between Common Tern chicks and adults?
+```
+qiime diversity adonis \
+  --i-distance-matrix Terns/COTE_Bray-Curtis-matrix_rarefied400.qza \
+  --m-metadata-file ../mdat.txt \
+  --p-formula Age+Year \
+  --p-permutations 999 \
+  --p-n-jobs 4 \
+  --o-visualization Terns/COTE_Bray-Curtis-adonis.qzv 
+```
+
+Both age and year are significant (F = 2.9, df = 1, p = 0.009 and F = 8.64, df = 1, p < 0.001, respectively). However, the variance explained is still low (R^2 = 0.01 and R^2 = 0.06, respectively).
+
+
+## 11. Alpha diversity
 
 Calculate alpha diversity using the Shannon index for all samples in both datasets:
 
@@ -491,12 +526,44 @@ qiime diversity alpha-group-significance \
 
 ```
 
-## 11. Plotting frequency of occurrence for COTE/ROST comparisons
+Shannon diversty is higher in Common Tern adult diets compared to chick diets, although it is barely significant (Kruskal-Wallis signed rank test, H = 3.87, p = 0.049).
+
+Shannon diversity is also higher in Roseate Tern chick diets compared to Common Tern chick diets (Kruskal-Wallis signed rank test, H = 6.55, p = 0.010).
+
+This Shannon diversity metric takes evenness into account, so what if we just look at the number of observed taxa? I think that will be a more useful comparison since we only have a couple of taxa per sample, so evenness is kind of arbitrary anyway.
+
+```
+qiime diversity alpha \
+  --i-table Terns/COTE_table_rarefied400.qza \
+  --p-metric observed_otus \
+  --o-alpha-diversity Terns/COTE_alpha_observed-features.qza
+  
+  
+qiime diversity alpha \
+  --i-table Terns/COTE_ROST_chicks_table_rarefied400.qza \
+  --p-metric observed_otus \
+  --o-alpha-diversity Terns/COTE_ROST_chicks_alpha_observed-features.qza
+  
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity Terns/COTE_alpha_observed-features.qza \
+  --m-metadata-file ../mdat.txt \
+  --o-visualization Terns/COTE_alpha_observed-features
+  
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity Terns/COTE_ROST_chicks_alpha_observed-features.qza \
+  --m-metadata-file ../mdat.txt \
+  --o-visualization Terns/COTE_ROST_chicks_alpha_observed-features  
+
+```
+
+Looking at just the number of observed features, there is no significant difference between adults and chicks in Common Terns (H = 0.64, p = 0.42) nor is there a significant difference between Common and Roseate Tern chick diets (H = 0.19, p = 0.66).
+
+## 12. Plotting frequency of occurrence to make figures for paper
 
 This is done in the script ```FOO.Rmd``` and the results are saved in the ```Figures``` folder.  
 
 
-## 12. Pianka's niche overlap
+## 13. Pianka's niche overlap
 
 I want to statistically compare the diets of Common and Roseate tern chicks, and also the diets of adult and chick Common terns. 
 
@@ -506,19 +573,3 @@ For these calculations, see ```Piankas_niche_overlap.Rmd```.
 
 
 
-## 13. Testing beta-divserity significance in a multivariate framework
-
-This can be achieved by the adonis plugin in Qiime. From the docs:
-
-> Determine whether groups of samples are significantly different from one another using the ADONIS permutation-based statistical test in vegan-R. The function partitions sums of squares of a multivariate data set, and is directly analogous to MANOVA (multivariate analysis of variance). This action differs from beta_group_significance in that it accepts R formulae to perform multi-way ADONIS tests; beta_group_signficance only performs one-way tests.
-
-
-```
-qiime diversity adonis \
-  --i-distance-matrix Terns/COTE_ROST_chicks_Bray-Curtis-matrix_rarefied400.qza \
-  --m-metadata-file ../mdat.txt \
-  --p-formula Species+Year \
-  --p-permutations 999 \
-  --p-n-jobs 4 \
-  --o-visualization Terns/COTE_ROST_chicks_Bray-Curtis-adonis.qzv 
-```
