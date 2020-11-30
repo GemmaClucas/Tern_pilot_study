@@ -365,12 +365,14 @@ do this by grouping by species and then filtering out species where FOO
 = 0.
 
 ``` r
+labels <- c(COTE = "Common Terns", ROST = "Roseate Terns")
+
 p <- All_FOO %>% 
   group_by(Species) %>% 
   filter(FOO > 0) %>% 
   ggplot() +
   geom_bar(aes(x = Species, y = FOO, fill = Species), stat = "identity") +
-  facet_grid(rows = vars(Year), cols = vars(BirdSpecies)) +
+  facet_grid(rows = vars(Year), cols = vars(BirdSpecies), labeller=labeller(BirdSpecies = labels)) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45,  hjust=1, colour = "black", margin = margin(t = 0)),
         axis.text.y = element_text(colour = "black"),
@@ -392,18 +394,124 @@ p
 ![](FOO_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
-ggsave(filename = "FOO_COTE_ROST_2017_2018_4panels.jpg",
-  plot = p,
-  dpi = 600,
-  device = "jpeg",
-  width = 7,
-  height = 4
-)
+# ggsave(filename = "FOO_COTE_ROST_2017_2018_4panels.jpg",
+#   plot = p,
+#   dpi = 600,
+#   device = "jpeg",
+#   width = 7,
+#   height = 4
+# )
+```
+
+## Editing plot for Roseate tern meeting
+
+I want to put the Roseates on the left, with sandlance first as the main
+prey.
+
+``` r
+# Define x axis order
+Species_ordered <-  c("Sandlance",
+                      "White hake",
+                      "Silver hake",
+                      "Red hake",
+                      "Atlantic herring",
+                      "River herring",
+                      "Fourbeard rockling",
+                      "Haddock",
+                      "Atlantic mackerel",
+                      "Atlantic butterfish",
+                      "Cunner",
+                      "Acadian redfish",
+                      "Mummichog",
+                      "Atlantic silverside",
+                      "Atlantic tomcod",
+                      "Spotted codling",
+                      "Three spined stickleback",
+                      "Black spotted stickleback",
+                      "Nine spine stickleback",
+                      "Radiated shanny",
+                      "American angler",
+                      "Atlantic cod",
+                      "Saithe",
+                      "Tautog",
+                      "Darter sp",
+                      "Red lionfish")
+
+Species_with_colours <- c("Sandlance" = rgb(207, 138, 54, max = 255),
+                      "White hake" = rgb(247, 224, 167, max = 255),
+                      "Silver hake" = rgb(225, 204, 150, max = 255),
+                      "Red hake" = rgb(187, 169, 126, max = 255),
+                      "Atlantic herring" = rgb(98, 64, 18, max = 255),
+                      "River herring" = rgb(150, 102, 34, max = 255),
+                      "Fourbeard rockling" = rgb(214,   237, 234, max = 255),
+                      "Haddock" = rgb(159, 211, 204, max = 255),
+                      "Atlantic mackerel" = rgb(92, 164, 160, max = 255),
+                      "Atlantic butterfish" = rgb(50,   118, 113, max = 255),
+                      "Cunner" = rgb(30, 75, 63, max = 255),
+                      "Acadian redfish" = rgb(5, 60, 245, max = 255),
+                      "Mummichog" = rgb(5, 57, 237, max = 255),
+                      "Atlantic silverside" = rgb(6, 56, 234, max = 255),
+                      "Atlantic tomcod" = rgb(4, 50, 211, max = 255),
+                      "Spotted codling" = rgb(3, 44, 190, max = 255),
+                      "Three spined stickleback" = rgb(3, 46, 199, max = 255),
+                      "Black spotted stickleback" = rgb(3, 39, 175, max = 255),
+                      "Nine spine stickleback" = rgb(1, 34, 157, max = 255),
+                      "Radiated shanny" = rgb(2, 29, 141, max = 255),
+                      "American angler" = rgb(1, 26, 122, max = 255),
+                      "Atlantic cod" = rgb(2, 21, 100, max = 255),
+                      "Saithe" = rgb(2, 19, 90, max = 255),
+                      "Tautog" = rgb(1, 15, 80, max = 255),
+                      "Darter sp" = rgb(0, 8, 60, max = 255),
+                      "Red lionfish" = rgb(0, 0,0, max = 255))
+
+# Set order of fish species
+All_FOO$Species <- scrub_periods(All_FOO)
+
+# Set factor order of ROST and COTE for plotting
+All_FOO$BirdSpecies_f = factor(All_FOO$BirdSpecies, levels=c("ROST", "COTE"))
+
+
+labels <- c(ROST = "Roseate Terns", COTE = "Common Terns")
+
+p <- All_FOO %>% 
+  group_by(Species) %>% 
+  filter(FOO > 0) %>% 
+  ggplot() +
+  geom_bar(aes(x = Species, y = FOO, fill = Species), stat = "identity") +
+  facet_grid(rows = vars(Year), cols = vars(BirdSpecies_f), labeller=labeller(BirdSpecies_f = labels)) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45,  hjust=1, colour = "black", margin = margin(t = 0)),
+        axis.text.y = element_text(colour = "black"),
+        axis.text=element_text(size=7),
+        axis.title=element_text(size=8, face = "bold"),
+        axis.ticks.x = element_blank(),
+        panel.border=element_rect(colour="black",size=1, fill = NA),
+        panel.spacing = unit(2, "mm"),
+        strip.background = element_blank(),
+        strip.text = element_text(colour = "black", size=8, face = "bold"),
+        axis.line = element_blank()) +
+  labs(y = "Frequency of occurrence (%)") +
+  scale_fill_manual(values = Species_with_colours) +
+  theme(legend.position = "none")
+
+p
+```
+
+![](FOO_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+``` r
+# ggsave(filename = "FOO_ROST_COTE_2017_2018_4panels.jpg",
+#   plot = p,
+#   dpi = 600,
+#   device = "jpeg",
+#   width = 7,
+#   height = 4
+# )
 ```
 
 ## Plotting Common Tern adults and chicks
 
-I need to calculate the FOO of the adult diets. First, get the data fpr
+I need to calculate the FOO of the adult diets. First, get the data for
 2017 adults and plot:
 
 ``` r
@@ -427,7 +535,7 @@ FOO %>%
   plot_FOO()
 ```
 
-![](FOO_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](FOO_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 Now do the same for 2018:
 
@@ -452,7 +560,7 @@ FOO %>%
   plot_FOO()
 ```
 
-![](FOO_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](FOO_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 Store the FOO in objects, so that I can then combine with the chick data
 
@@ -603,12 +711,15 @@ kable(All_FOO)
 Get rid of species that have zero FOO in all groups and plot
 
 ``` r
+# Make labels for the top row
+labels <- c(adult = "Adults", chick = "Chicks")
+
 p <- All_FOO %>% 
   group_by(Species) %>% 
   filter(FOO > 0) %>% 
   ggplot() +
   geom_bar(aes(x = Species, y = FOO, fill = Species), stat = "identity") +
-  facet_grid(rows = vars(Year), cols = vars(Age)) +
+  facet_grid(rows = vars(Year), cols = vars(Age), labeller=labeller(Age = labels)) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45,  hjust=1, colour = "black", margin = margin(t = 0)),
         axis.text.y = element_text(colour = "black"),
@@ -621,13 +732,21 @@ p <- All_FOO %>%
         strip.text = element_text(colour = "black", size=8, face = "bold"),
         axis.line = element_blank()) +
   labs(y = "Frequency of occurrence (%)") +
-  #scale_fill_manual(values = Species_colours,
-  #                  breaks = Species_ordered,
-  #                  labels = Species_ordered) +
+  ylim(0, 100) +
   scale_fill_manual(values = Species_with_colours) +
   theme(legend.position = "none")
 
 p
 ```
 
-![](FOO_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](FOO_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+``` r
+ggsave(filename = "FOO_COTE_adultsVchicks_2017_2018_4panels.jpg",
+  plot = p,
+  dpi = 600,
+  device = "jpeg",
+  width = 7,
+  height = 4
+)
+```
