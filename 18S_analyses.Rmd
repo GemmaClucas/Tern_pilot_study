@@ -355,7 +355,7 @@ q
 
 
 ```{r}
-ggsave(filename = "/Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fecal_data_analysis/18S/Terns/18S_FOO_ROST_chicks_2017_2018_2panels.jpg",
+ggsave(filename = "/Users/gemmaclucas/GitHub/Fecal_metabarcoding/Tern_pilot_study/Figures/18S_FOO_ROST_chicks_2017_2018_2panels.jpg",
   plot = q,
   dpi = 600,
   device = "jpeg",
