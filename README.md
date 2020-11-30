@@ -1,4 +1,4 @@
-# Tern_pilot_study
+# Tern_pilot_study_MiFish_analyses
 
 This is an outline of the steps I'm taking to finish the analyses for this first paper. All the files are still in my Dropbox folder (as opposed to GitHub) and I'm running the code in the terminal.
 
