@@ -1,0 +1,458 @@
+18S\_analysis\_steps
+================
+Gemma Clucas
+11/20/2020
+
+Load qiime on laptop and `cd` to correct directory.
+
+    conda activate qiime2-2019.4
+    cd /Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fecal_data_analysis/18S
+
+## Primary vs secondary consumption
+
+This is a big issue with the 18S data. Lots of copepod sequences come
+up, which are definitely due to secondary consumption.
+
+The Birds of the World account for Common Terns only reports them
+feeding on fish, insects, crustaceans, and squid. The account for
+Roseates reports even fewer non-fish prey. However, making arbitrary
+decisions about what may or may not be primary prey is unnecessary. If I
+present all non-parasite data, then I can talk about how this captures
+information about the food web as a whole i.e. the importance of
+copepods in the system. I can also use prey size and FOO to determine
+what are important components of the tern diets and what isn’t.
+
+## Separate out the data from different tern species
+
+Extract the COTE sequences from the table and rep-seqs.
+
+    qiime feature-table filter-samples \
+      --i-table merged_table_sklearn_onlymetazoa.qza \
+      --m-metadata-file mdat.txt \
+      --p-where "Species='COTE'" \
+      --o-filtered-table Terns/COTE_merged_table_onlymetazoa.qza 
+      
+    qiime feature-table filter-seqs \
+      --i-data merged_rep-seqs.qza \
+      --i-table Terns/COTE_merged_table_onlymetazoa.qza \
+      --o-filtered-data Terns/COTE_seqs_onlymetazoa.qza
+
+Create the `.qzv` files to go with the table and rep-seqs.
+
+``` 
+qiime feature-table summarize \
+    --i-table Terns/COTE_merged_table_onlymetazoa.qza \
+    --m-sample-metadata-file mdat.txt \
+    --o-visualization Terns/COTE_merged_table_onlymetazoa
+    
+qiime feature-table tabulate-seqs \
+    --i-data Terns/COTE_seqs_onlymetazoa.qza \
+    --o-visualization Terns/COTE_seqs_onlymetazoa  
+    
+qiime taxa barplot \
+  --i-table Terns/COTE_merged_table_onlymetazoa.qza \
+  --i-taxonomy sklearn_taxonomy.qza \
+  --m-metadata-file mdat.txt \
+  --o-visualization Terns/COTE_merged_table_onlymetazoa_barplot    
+```
+
+Extract the ROST sequences from the table and rep-seqs.
+
+    qiime feature-table filter-samples \
+      --i-table merged_table_sklearn_onlymetazoa.qza \
+      --m-metadata-file mdat.txt \
+      --p-where "Species='ROST'" \
+      --o-filtered-table Terns/ROST_merged_table_onlymetazoa.qza 
+      
+    qiime feature-table filter-seqs \
+      --i-data merged_rep-seqs.qza \
+      --i-table Terns/ROST_merged_table_onlymetazoa.qza \
+      --o-filtered-data Terns/ROST_seqs_onlymetazoa.qza
+
+Create the `.qzv` files to go with the table and rep-seqs.
+
+``` 
+qiime feature-table summarize \
+    --i-table Terns/ROST_merged_table_onlymetazoa.qza \
+    --m-sample-metadata-file mdat.txt \
+    --o-visualization Terns/ROST_merged_table_onlymetazoa
+    
+qiime feature-table tabulate-seqs \
+    --i-data Terns/ROST_seqs_onlymetazoa.qza \
+    --o-visualization Terns/ROST_seqs_onlymetazoa 
+    
+qiime taxa barplot \
+  --i-table Terns/ROST_merged_table_onlymetazoa.qza \
+  --i-taxonomy sklearn_taxonomy.qza \
+  --m-metadata-file mdat.txt \
+  --o-visualization Terns/ROST_merged_table_onlymetazoa_barplot       
+```
+
+## Exclude bird, mammal, and parasite DNA from ROST data
+
+Only done for ROST so far, need to go through the barplots from COTE to
+find the right terms to exlude before running these commands.
+
+    qiime taxa filter-table \
+      --i-table Terns/ROST_merged_table_onlymetazoa.qza \
+      --i-taxonomy sklearn_taxonomy.qza \
+      --p-exclude Aves,Mammalia,Chromadore,Myxosporea,Acari,Digenea,Eucestoda \
+      --o-filtered-table Terns/ROST_table_noBirdsMammalsParasites
+    
+    qiime taxa barplot \
+      --i-table Terns/ROST_table_noBirdsMammalsParasites.qza \
+      --i-taxonomy sklearn_taxonomy.qza \
+      --m-metadata-file mdat.txt \
+      --o-visualization Terns/ROST_noBirdsMammalsParasites_barplot
+
+## Check PCR and extraction blanks for contamination (all tern species)
+
+I checked the extraction and PCR blanks for the ROST samples and all are
+clear or below levels that will be removed by rarefaction (fewer than
+300 sequences). There is one instance (EXT\_BLANK\_7) where there are a
+large amount of sequences in the blank, but this is due to
+cross-contamination from an adjacent well, as noted in my lab notebook
+at the time. Therefore, I do not need to account for cross-contamination
+in my analysis of the ROST samples.
+
+Field blanks were totally clear i.e. no sequences reached this stage in
+the analysis.
+
+**I should remove ROST\_SEA\_CH\_496 and ROST\_SEA\_CH\_498 because they
+could also have been affected by cross-contamination**
+
+## Calculate rarefaction depth for ROST data
+
+I need to collapse taxonomy first, so I am not counting ASVs. This does
+make a difference to the rarefaction curves calculated below.
+
+    qiime taxa collapse \
+        --i-table Terns/ROST_table_noBirdsMammalsParasites.qza \
+        --i-taxonomy sklearn_taxonomy.qza \
+        --p-level 7 \
+        --o-collapsed-table Terns/ROST_collapsedtable_noBirdsMammalsParasites.qza
+
+Calculate rarefection curves broadly up to 20,000, then zoom in on the
+left hand side of the plot to figure out the exact cut-off to use.
+
+``` 
+qiime diversity alpha-rarefaction \
+  --i-table Terns/ROST_collapsedtable_noBirdsMammalsParasites.qza \
+  --m-metadata-file mdat.txt \
+  --p-min-depth 100 \
+  --p-max-depth 20000 \
+  --o-visualization Terns/ROST_noBirdsMammalsParasite_alpha-rarefaction_100-20000
+  
+qiime diversity alpha-rarefaction \
+  --i-table Terns/ROST_collapsedtable_noBirdsMammalsParasites.qza \
+  --m-metadata-file mdat.txt \
+  --p-min-depth 100 \
+  --p-max-depth 6000 \
+  --o-visualization Terns/ROST_noBirdsMammalsParasite_alpha-rarefaction_100-6000
+  
+```
+
+The number of observed OTUs is flat at 4 from 750 to 4750 reads, but
+then increases to five when you reach 6000 reads. Given I have barely
+any samples with more than 6000 sequences, I will rarefy to 750 for now
+but bear this in mind for writing up the data.
+
+## Rarefy to a sampling depth of 750 for ROST
+
+Note, this needs to be done on the original feature table, not the
+collapsed one.
+
+    qiime feature-table rarefy \
+      --i-table Terns/ROST_table_noBirdsMammalsParasites.qza \
+      --p-sampling-depth 750 \
+      --o-rarefied-table Terns/ROST_table_rarefied750 
+
+Redo the barplots for the rarefied data
+
+    qiime taxa barplot\
+          --i-table Terns/ROST_table_rarefied750.qza \
+          --i-taxonomy sklearn_taxonomy.qza \
+          --m-metadata-file mdat.txt \
+          --o-visualization Terns/ROST_table_rarefied750-barplots.qzv
+
+Then I exported the `.csv` file from Qiime Viewer using level 6 taxonomy
+and grouped all Copepoda (the vast majority were Calanoida).
+
+## Create FOO barplot
+
+``` r
+library(ggplot2)
+library(RColorBrewer)
+library(reshape2)
+library(tidyverse)
+```
+
+    ## ── Attaching packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
+
+    ## ✓ tibble  2.1.3     ✓ dplyr   0.8.4
+    ## ✓ tidyr   1.0.2     ✓ stringr 1.4.0
+    ## ✓ readr   1.3.1     ✓ forcats 0.5.0
+    ## ✓ purrr   0.3.3
+
+    ## ── Conflicts ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+    ## x dplyr::filter() masks stats::filter()
+    ## x dplyr::lag()    masks stats::lag()
+
+``` r
+library(viridis)
+```
+
+    ## Loading required package: viridisLite
+
+``` r
+library(knitr)
+
+df <- read.csv("/Users/gemmaclucas/Dropbox/Diets_from_poop/2019_terns_puffins_fecal_data_analysis/18S/Terns/ROST_table_rarefied750_level6_namesEdited.csv", header = TRUE) %>% 
+  mutate(Year = as.factor(Year))
+```
+
+I need to define the order of the taxa along the x-axis, so that it is
+consistent among graphs.
+
+``` r
+Species_ordered <- c("Teleostei",
+             "Copepoda",
+             "Eucarida",
+             "Hymenoptera",
+             "Hemiptera",
+             "Heterobranchia",
+             "Collembola",
+             "Lepidoptera",
+             "Coleoptera",
+             "Neoptera",
+             "Araneae",
+             "Caenogastropoda",
+             "Semaeostomeae",
+             "Mytiloida",
+             "Ploimida")
+
+Species_with_colours <- c("Teleostei"= rgb(98, 64, 18, max = 255),
+             "Copepoda" = rgb(150, 102, 34, max = 255),
+             "Eucarida" = rgb(207, 138, 54, max = 255),
+             "Hymenoptera" = rgb(247, 224, 167, max = 255),
+             "Hemiptera" = rgb(225, 204, 150, max = 255),
+             "Heterobranchia" = rgb(187, 169, 126, max = 255),
+             "Collembola" = rgb(214,    237, 234, max = 255),
+             "Lepidoptera" = rgb(159, 211, 204, max = 255),
+             "Coleoptera" = rgb(92, 164, 160, max = 255),
+             "Neoptera" = rgb(50,   118, 113, max = 255),
+             "Araneae" = rgb(30, 75, 63, max = 255),
+             "Caenogastropoda" = rgb(5, 60, 245, max = 255),
+             "Semaeostomeae" = rgb(5, 57, 237, max = 255),
+             "Mytiloida" = rgb(6, 56, 234, max = 255),
+             "Ploimida" = rgb(4, 50, 211, max = 255))
+```
+
+Functions to calculate FOO and plot
+
+``` r
+calc_FOO <- function(x) {
+  x %>% 
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%     # change to detection/non-detection
+  summarise_each(funs = sum) %>%              # count number of detections
+  melt() %>%                                  # make into long dataframe
+  rename(Occurrence = value,
+         Species = variable) %>% 
+  mutate(FOO = Occurrence/n_samples*100)
+}
+
+
+# get rid of periods in column names and order species
+scrub_periods <- function(x) {
+  x$Species <-  gsub("\\.", " ", x$Species)
+  x$Species <- factor(x$Species, levels = Species_ordered)
+}
+
+# function to plot, with the species in the order determined by Species_with_colours
+plot_FOO <- function(x) {
+  x %>% 
+    ggplot() +
+    geom_bar(aes(x = Species, y = FOO, fill = Species), stat = "identity") +
+    theme_classic() +
+    theme(axis.text.x = element_text(angle = 45,  hjust=1)) +
+    labs(y = "Frequency of occurrence (%)") 
+    #scale_fill_manual(values = Species_with_colours)
+}
+```
+
+Select the data for each year and age class
+
+``` r
+# Filter the data and save to object
+ROST_chicks_2017 <- df %>% 
+  filter(Age == "chick" & Year == 2017) %>% 
+  select(Coleoptera:Eucarida) 
+n_samples <- nrow(ROST_chicks_2017)
+FOO_ROST_chicks_2017 <- calc_FOO(ROST_chicks_2017)
+```
+
+    ## No id variables; using all as measure variables
+
+``` r
+FOO_ROST_chicks_2017$Year <- "2017"
+FOO_ROST_chicks_2017$Age <- "chick"
+
+# Filter the data and save to object
+ROST_chicks_2018 <- df %>% 
+  filter(Age == "chick" & Year == 2018) %>% 
+  select(Coleoptera:Eucarida) 
+n_samples <- nrow(ROST_chicks_2018)
+FOO_ROST_chicks_2018 <- calc_FOO(ROST_chicks_2018)
+```
+
+    ## No id variables; using all as measure variables
+
+``` r
+FOO_ROST_chicks_2018$Year <- "2018"
+FOO_ROST_chicks_2018$Age <- "chick"
+
+# Filter the data and save to object
+ROST_adults_2018 <- df %>% 
+  filter(Age == "adult" & Year == 2018) %>% 
+  select(Coleoptera:Eucarida) 
+n_samples <- nrow(ROST_adults_2018)
+FOO_ROST_adults_2018 <- calc_FOO(ROST_adults_2018)
+```
+
+    ## No id variables; using all as measure variables
+
+``` r
+FOO_ROST_adults_2018$Year <- "2018"
+FOO_ROST_adults_2018$Age <- "adult"
+```
+
+Use row binding to add all the dataframes together so that I can use
+faceting to plot.
+
+``` r
+All_FOO <- FOO_ROST_chicks_2017 %>% 
+  bind_rows(., FOO_ROST_chicks_2018) %>% 
+  bind_rows(., FOO_ROST_adults_2018)
+
+All_FOO$Species <- scrub_periods(All_FOO)
+
+kable(All_FOO)
+```
+
+| Species         | Occurrence |        FOO | Year | Age   |
+| :-------------- | ---------: | ---------: | :--- | :---- |
+| Coleoptera      |          2 |   5.882353 | 2017 | chick |
+| Hemiptera       |          5 |  14.705882 | 2017 | chick |
+| Hymenoptera     |          6 |  17.647059 | 2017 | chick |
+| Neoptera        |          1 |   2.941177 | 2017 | chick |
+| Lepidoptera     |          0 |   0.000000 | 2017 | chick |
+| Teleostei       |         34 | 100.000000 | 2017 | chick |
+| Semaeostomeae   |          0 |   0.000000 | 2017 | chick |
+| Caenogastropoda |          0 |   0.000000 | 2017 | chick |
+| Heterobranchia  |          0 |   0.000000 | 2017 | chick |
+| Ploimida        |          0 |   0.000000 | 2017 | chick |
+| Araneae         |          0 |   0.000000 | 2017 | chick |
+| Collembola      |          3 |   8.823529 | 2017 | chick |
+| Mytiloida       |          2 |   5.882353 | 2017 | chick |
+| Copepoda        |         26 |  76.470588 | 2017 | chick |
+| Eucarida        |          8 |  23.529412 | 2017 | chick |
+| Coleoptera      |          1 |   2.439024 | 2018 | chick |
+| Hemiptera       |          1 |   2.439024 | 2018 | chick |
+| Hymenoptera     |          0 |   0.000000 | 2018 | chick |
+| Neoptera        |          0 |   0.000000 | 2018 | chick |
+| Lepidoptera     |          1 |   2.439024 | 2018 | chick |
+| Teleostei       |         41 | 100.000000 | 2018 | chick |
+| Semaeostomeae   |          1 |   2.439024 | 2018 | chick |
+| Caenogastropoda |          1 |   2.439024 | 2018 | chick |
+| Heterobranchia  |          0 |   0.000000 | 2018 | chick |
+| Ploimida        |          1 |   2.439024 | 2018 | chick |
+| Araneae         |          1 |   2.439024 | 2018 | chick |
+| Collembola      |          2 |   4.878049 | 2018 | chick |
+| Mytiloida       |          0 |   0.000000 | 2018 | chick |
+| Copepoda        |         36 |  87.804878 | 2018 | chick |
+| Eucarida        |          6 |  14.634146 | 2018 | chick |
+| Coleoptera      |          0 |   0.000000 | 2018 | adult |
+| Hemiptera       |          0 |   0.000000 | 2018 | adult |
+| Hymenoptera     |          0 |   0.000000 | 2018 | adult |
+| Neoptera        |          0 |   0.000000 | 2018 | adult |
+| Lepidoptera     |          0 |   0.000000 | 2018 | adult |
+| Teleostei       |          8 | 100.000000 | 2018 | adult |
+| Semaeostomeae   |          0 |   0.000000 | 2018 | adult |
+| Caenogastropoda |          0 |   0.000000 | 2018 | adult |
+| Heterobranchia  |          1 |  12.500000 | 2018 | adult |
+| Ploimida        |          0 |   0.000000 | 2018 | adult |
+| Araneae         |          0 |   0.000000 | 2018 | adult |
+| Collembola      |          0 |   0.000000 | 2018 | adult |
+| Mytiloida       |          0 |   0.000000 | 2018 | adult |
+| Copepoda        |          7 |  87.500000 | 2018 | adult |
+| Eucarida        |          2 |  25.000000 | 2018 | adult |
+
+``` r
+p <- All_FOO %>% 
+  group_by(Species) %>% 
+  filter(FOO > 0) %>% 
+  ggplot() +
+  geom_bar(aes(x = Species, y = FOO, fill = Species), stat = "identity") +
+  facet_grid(rows = vars(Year), cols = vars(Age)) +
+  ylim(0, 100) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45,  hjust=1, colour = "black", margin = margin(t = 0)),
+        axis.text.y = element_text(colour = "black"),
+        axis.text=element_text(size=7),
+        axis.title=element_text(size=8, face = "bold"),
+        axis.ticks.x = element_blank(),
+        panel.border=element_rect(colour="black",size=1, fill = NA),
+        panel.spacing = unit(2, "mm"),
+        strip.background = element_blank(),
+        strip.text = element_text(colour = "black", size=8, face = "bold"),
+        axis.line = element_blank()) +
+  labs(y = "Frequency of occurrence (%)") +
+  scale_fill_manual(values = Species_with_colours) +
+  theme(legend.position = "none")
+
+p
+```
+
+![](18S_analyses_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
+q <- All_FOO %>% 
+  group_by(Species) %>% 
+  filter(FOO > 0) %>% 
+  ggplot() +
+  geom_bar(aes(x = Species, y = FOO, fill = Species), stat = "identity") +
+  facet_grid(rows = vars(Year)) +
+  ylim(0, 100) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45,  hjust=1, colour = "black", margin = margin(t = 0)),
+        axis.text.y = element_text(colour = "black"),
+        axis.text=element_text(size=7),
+        axis.title=element_text(size=8, face = "bold"),
+        axis.ticks.x = element_blank(),
+        panel.border=element_rect(colour="black",size=1, fill = NA),
+        panel.spacing = unit(2, "mm"),
+        strip.background = element_blank(),
+        strip.text = element_text(colour = "black", size=8, face = "bold"),
+        axis.line = element_blank()) +
+  labs(y = "Frequency of occurrence (%)") +
+  scale_fill_manual(values = Species_with_colours) +
+  theme(legend.position = "none")
+
+q
+```
+
+    ## Warning: Removed 2 rows containing missing values (geom_bar).
+
+![](18S_analyses_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+ggsave(filename = "/Users/gemmaclucas/GitHub/Fecal_metabarcoding/Tern_pilot_study/Figures/18S_FOO_ROST_chicks_2017_2018_2panels.jpg",
+  plot = q,
+  dpi = 600,
+  device = "jpeg",
+  width = 5,
+  height = 5
+)
+```
+
+    ## Warning: Removed 2 rows containing missing values (geom_bar).

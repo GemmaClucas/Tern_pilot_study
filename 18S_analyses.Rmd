@@ -2,7 +2,7 @@
 title: "18S_analysis_steps"
 author: "Gemma Clucas"
 date: "11/20/2020"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -347,8 +347,10 @@ q <- All_FOO %>%
         strip.text = element_text(colour = "black", size=8, face = "bold"),
         axis.line = element_blank()) +
   labs(y = "Frequency of occurrence (%)") +
-  scale_fill_manual(values = Species_with_colours) +
+  #scale_fill_manual(values = Species_with_colours) +  # colour scale Liz used
+  scale_fill_manual(values = c(rep.int(rgb(182, 52, 19, max = 255), 1), rep.int(rgb(63, 63, 63, max = 255), 14))) +
   theme(legend.position = "none")
+
 
 q
 ```
