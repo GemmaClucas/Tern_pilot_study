@@ -391,20 +391,21 @@ p <- All_FOO %>%
         strip.text = element_text(colour = "black", size=8, face = "bold"),
         axis.line = element_blank()) +
   labs(y = "Frequency of occurrence (%)") +
-  scale_fill_manual(values = Species_with_colours) +
+  #scale_fill_manual(values = Species_with_colours) +
+  scale_fill_manual(values = c(rep.int(rgb(182, 52, 19, max = 255), 1), rep.int(rgb(63, 63, 63, max = 255), 19))) +
   theme(legend.position = "none")
 
 p
 ```
 
 ```{r}
-# ggsave(filename = "FOO_ROST_COTE_2017_2018_4panels.jpg",
-#   plot = p,
-#   dpi = 600,
-#   device = "jpeg",
-#   width = 7,
-#   height = 4
-# )
+ggsave(filename = "FOO_ROST_COTE_2017_2018_4panels.jpg",
+  plot = p,
+  dpi = 600,
+  device = "jpeg",
+  width = 7,
+  height = 4
+)
 ```
 
 ## Plotting Common Tern adults and chicks
