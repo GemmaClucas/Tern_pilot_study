@@ -134,7 +134,14 @@ COTE_chicks_2017 <- df %>%
 # record number of records for calculating FOO
 n_samples <- nrow(COTE_chicks_2017)
 FOO <- calc_FOO(COTE_chicks_2017)
+```
 
+    ## Warning: `summarise_each_()` is deprecated as of dplyr 0.7.0.
+    ## Please use `across()` instead.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_warnings()` to see where this warning was generated.
+
+``` r
 FOO$Species <- scrub_periods(FOO)
 
 FOO %>% 
@@ -491,7 +498,8 @@ p <- All_FOO %>%
         strip.text = element_text(colour = "black", size=8, face = "bold"),
         axis.line = element_blank()) +
   labs(y = "Frequency of occurrence (%)") +
-  scale_fill_manual(values = Species_with_colours) +
+  #scale_fill_manual(values = Species_with_colours) +
+  scale_fill_manual(values = c(rep.int(rgb(182, 52, 19, max = 255), 1), rep.int(rgb(63, 63, 63, max = 255), 19))) +
   theme(legend.position = "none")
 
 p
@@ -499,12 +507,82 @@ p
 
 ![](FOO_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
+Create same plot but just for Roseates. Fish are ordered from most to
+least abundant in 2017.
+
+``` r
+Species_ordered <-  c("Sandlance",
+                      "White hake",
+                      "Atlantic herring",
+                      "Haddock",
+                      "Atlantic butterfish",
+                      "River herring",
+                      "Silver hake",
+                      "Red hake",
+                      "Fourbeard rockling",
+                      "Atlantic mackerel",
+                      "Cunner",
+                      "Acadian redfish",
+                      "Mummichog",
+                      "Atlantic silverside",
+                      "Atlantic tomcod",
+                      "Spotted codling",
+                      "Three spined stickleback",
+                      "Black spotted stickleback",
+                      "Nine spine stickleback",
+                      "Radiated shanny",
+                      "American angler",
+                      "Atlantic cod",
+                      "Saithe",
+                      "Tautog",
+                      "Darter sp",
+                      "Red lionfish")
+
+# Set order of fish species
+All_FOO$Species <- scrub_periods(All_FOO)
+
+p <- All_FOO %>% 
+  filter(BirdSpecies == "ROST") %>% 
+  group_by(Species) %>% 
+  filter(FOO > 0) %>% 
+  ggplot() +
+  geom_bar(aes(x = Species, y = FOO, fill = Species), stat = "identity") +
+  facet_grid(rows = vars(Year), cols = vars(BirdSpecies_f), labeller=labeller(BirdSpecies_f = labels)) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45,  hjust=1, colour = "black", margin = margin(t = 0)),
+        axis.text.y = element_text(colour = "black"),
+        axis.text=element_text(size=7),
+        axis.title=element_text(size=8, face = "bold"),
+        axis.ticks.x = element_blank(),
+        panel.border=element_rect(colour="black",size=1, fill = NA),
+        panel.spacing = unit(2, "mm"),
+        strip.background = element_blank(),
+        strip.text = element_text(colour = "black", size=8, face = "bold"),
+        axis.line = element_blank()) +
+  labs(y = "Frequency of occurrence (%)") +
+  #scale_fill_manual(values = Species_with_colours) +
+  scale_fill_manual(values = c(rep.int(rgb(182, 52, 19, max = 255), 1), rep.int(rgb(63, 63, 63, max = 255), 19))) +
+  theme(legend.position = "none")
+
+p
+```
+
+![](FOO_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
 ``` r
 # ggsave(filename = "FOO_ROST_COTE_2017_2018_4panels.jpg",
 #   plot = p,
 #   dpi = 600,
 #   device = "jpeg",
 #   width = 7,
+#   height = 4
+# )
+
+# ggsave(filename = "FOO_ROST_2017_2018_2panels.jpg",
+#   plot = p,
+#   dpi = 600,
+#   device = "jpeg",
+#   width = 4,
 #   height = 4
 # )
 ```
@@ -535,7 +613,7 @@ FOO %>%
   plot_FOO()
 ```
 
-![](FOO_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](FOO_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 Now do the same for 2018:
 
@@ -560,7 +638,7 @@ FOO %>%
   plot_FOO()
 ```
 
-![](FOO_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](FOO_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 Store the FOO in objects, so that I can then combine with the chick data
 
@@ -739,14 +817,23 @@ p <- All_FOO %>%
 p
 ```
 
-![](FOO_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](FOO_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
-ggsave(filename = "FOO_COTE_adultsVchicks_2017_2018_4panels.jpg",
-  plot = p,
-  dpi = 600,
-  device = "jpeg",
-  width = 7,
-  height = 4
-)
+# ggsave(filename = "FOO_COTE_adultsVchicks_2017_2018_4panels.jpg",
+#   plot = p,
+#   dpi = 600,
+#   device = "jpeg",
+#   width = 7,
+#   height = 4
+# )
+```
+
+## ROST adults
+
+``` r
+# Filter the data and save to object
+ROST_adults <- df %>% 
+  filter(Species == "ROST" & Age == "adult") %>% 
+  select(River.herring:White.hake) 
 ```
